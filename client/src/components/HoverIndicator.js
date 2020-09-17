@@ -1,6 +1,6 @@
 import React from 'react'
 import { TILE_WIDTH, TILE_HEIGHT} from '../constants'
-import { Straight, Curve } from './TrackSegment'
+import { Straight, Curve, YLeft, YRight } from './TrackTile'
 
 const noop = () => {}
 
@@ -22,15 +22,27 @@ export default ({tileCoords, insertTile=noop}) => {
 
       <g transform="scale(0.4)">
         <g onClick={() => insertTile(newTile("STRAIGHT"))}
-           transform={`translate(${0.1*TILE_WIDTH}, ${0.5*TILE_HEIGHT})`}
+           transform={`translate(${0.1*TILE_WIDTH}, ${0.1*TILE_HEIGHT})`}
         >
           <Straight rotation={0} />
         </g>
 
         <g onClick={() => insertTile(newTile("CURVE"))}
-           transform={`translate(${1.2*TILE_WIDTH}, ${0.5*TILE_HEIGHT})`}
+           transform={`translate(${1.4*TILE_WIDTH}, ${0.1*TILE_HEIGHT})`}
         >
           <Curve rotation={0} />
+        </g>
+
+        <g onClick={() => insertTile(newTile("YLEFT"))}
+           transform={`translate(${0.1*TILE_WIDTH}, ${1.4*TILE_HEIGHT})`}
+        >
+          <YLeft rotation={0} />
+        </g>
+
+        <g onClick={() => insertTile(newTile("YLEFT"))}
+           transform={`translate(${1.4*TILE_WIDTH}, ${1.4*TILE_HEIGHT})`}
+        >
+          <YRight rotation={0} />
         </g>
 
       </g>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import Straight from './Straight'
 import Curve from './Curve'
+import YLeft from './YLeft'
+import YRight from './YRight'
 import { TILE_WIDTH, TILE_HEIGHT } from '../../constants'
 
 const noop = () => {}
@@ -13,6 +15,8 @@ export default ({ id, type, rotation, position, updateTile=noop }) => {
 
   const Track = (type === 'STRAIGHT') ? Straight
               : (type === "CURVE")    ? Curve
+              : (type === "YLEFT")    ? YLeft
+              : (type === "YRIGHT")   ? YRight
               : () => <></>
 
   return (
@@ -39,3 +43,5 @@ export default ({ id, type, rotation, position, updateTile=noop }) => {
 
 export { default as Straight } from "./Straight"
 export { default as Curve } from "./Curve"
+export { default as YLeft } from './YLeft'
+export { default as YRight } from './YRight'
