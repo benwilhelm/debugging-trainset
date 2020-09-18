@@ -4,6 +4,7 @@ import Curve from './Curve'
 import YLeft from './YLeft'
 import YRight from './YRight'
 import { TILE_WIDTH, TILE_HEIGHT } from '../../constants'
+import Engine from '../Engine'
 
 const noop = () => {}
 
@@ -12,6 +13,8 @@ export default ({ id, type, rotation, position, updateTile=noop }) => {
   const [ state, setState ] = useState({
     hovering: false
   })
+
+  const rotateTile = () => updateTile({ id, rotation: (rotation+90) % 360})
 
   const Track = (type === 'STRAIGHT') ? Straight
               : (type === "CURVE")    ? Curve
@@ -27,14 +30,13 @@ export default ({ id, type, rotation, position, updateTile=noop }) => {
       onMouseLeave={() => setState({ hovering: false })}
     >
       <Track rotation={rotation} />
-
       {state.hovering && (
         <rect
           x={TILE_WIDTH/2 - 10}
           y={TILE_HEIGHT/2 - 10}
           width={20}
           height={20}
-          onClick={() => updateTile({ id, rotation: (rotation+90) % 360})}
+          onClick={rotateTile}
         />
       )}
     </svg>
