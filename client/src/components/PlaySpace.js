@@ -1,12 +1,20 @@
 import React, { useState, useRef } from 'react'
-import { v4 as uuid } from 'uuid'
 import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
 import Engine from './Engine'
 import EngineSpeed from './EngineSpeed'
-import { loop as trackSetData } from '../data/trackset'
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants'
 import useAnimationFrame from '../hooks/useAnimationFrame'
+import store, {
+  updateTile,
+  insertTile,
+  updateEngine,
+  indexFromPosition,
+  selectAllEngines,
+  selectAllTiles,
+  selectTileByPosition
+} from '../store'
+import { connect } from 'react-redux'
 
 const travelTransform = (tile, [x, y]) => {
   const [ax, ay] = [TILE_WIDTH/2, TILE_HEIGHT/2]
@@ -96,23 +104,11 @@ function pageCoordsToSvgCoords(pageCoords, svg) {
   return [ x, y ]
 }
 
-export default () => {
-  const [tiles, setTiles] = useState(trackSetData)
-  const [ enginePosition, setEnginePosition ] = useState([240, 210])
-  const [ engineSpeed, setEngineSpeed ] = useState(0)
+const PlaySpace = ({ tiles, engines, dispatchUpdateTile, dispatchInsertTile, dispatchUpdateEngine }) => {
   const [viewBox, setViewBox] = useState([0, 0, 800, 400])
   const [ tileCoords, setTileCoords ] = useState([0, 0])
   const svgEl = useRef(null)
   const tilePosition = useRef({ tileId: null, step: 0 })
-
-  const updateTile = (tile) => {
-    setTiles(allTiles => allTiles.map(t => t.id === tile.id ? {...t, ...tile} : t))
-  }
-
-  const insertTile = (tile) => {
-    const id = uuid()
-    setTiles(allTiles => [...allTiles, { ...tile, id }])
-  }
 
   const handleMouseMove = (evt) => {
     const [x, y] = pageCoordsToSvgCoords([evt.clientX, evt.clientY], svgEl.current)
@@ -141,37 +137,31 @@ export default () => {
   }
 
   useAnimationFrame((deltaTime) => {
-    // setTiles is a hack to get the current tiles array,
-    // rather than freezing it due to closure
-    setTiles(tiles => {
-      setEngineSpeed((currentSpeed) => {
-        setEnginePosition((currentPosition) => {
-          const [ x, y ] = currentPosition
-          const tileCoords = [
-            Math.floor(x / TILE_WIDTH),
-            Math.floor(y / TILE_HEIGHT)
-          ]
-          const overTile = tiles.find(t => t.position[0] === tileCoords[0] && t.position[1] === tileCoords[1])
-          if (!overTile) {
-            return [ x, y ]
-          }
+    const state = store.getState()
+    selectAllEngines(state).forEach(engine => {
+      const [ x, y ] = engine.coordinates
+      const tileCoords = [
+        Math.floor(x / TILE_WIDTH),
+        Math.floor(y / TILE_HEIGHT)
+      ]
 
-          if (tilePosition.current.tileId !== overTile.id) {
-            tilePosition.current = {
-              tileId: overTile.id,
-              travelFunction: getTravelFunction(overTile, [x, y]),
-              step: 0
-            }
-          }
 
-          tilePosition.current.step += (deltaTime / 1000) * currentSpeed
-          return tilePosition.current.travelFunction(tilePosition.current.step)
-        })
+      const overTile = selectTileByPosition(state, tileCoords)
+      if (!overTile) {
+        return [ x, y ]
+      }
 
-        return currentSpeed
-      })
-      // returning  original tiles array
-      return tiles
+      if (tilePosition.current.tileId !== overTile.id) {
+        tilePosition.current = {
+          tileId: overTile.id,
+          travelFunction: getTravelFunction(overTile, [x, y]),
+          step: 0
+        }
+      }
+
+      tilePosition.current.step += (deltaTime / 1000) * engine.speed
+      const newCoordinates = tilePosition.current.travelFunction(tilePosition.current.step)
+      dispatchUpdateEngine(engine.id, { coordinates: newCoordinates })
     })
   })
 
@@ -183,14 +173,30 @@ export default () => {
            onMouseMove={handleMouseMove}
            onWheel={handleMouseWheel}
       >
-        <HoverIndicator tileCoords={tileCoords} insertTile={insertTile} />
+        <HoverIndicator tileCoords={tileCoords} insertTile={dispatchInsertTile} />
         {tiles.map((tile) => (
-          <TrackTile key={tile.id} {...tile} updateTile={updateTile} />
+          <TrackTile key={tile.position} {...tile} updateTile={dispatchUpdateTile} />
         ))}
 
-        <Engine position={enginePosition} />
+        {engines.map(engine => <Engine key={engine.id} coordinates={engine.coordinates} />)}
       </svg>
-      <EngineSpeed onUpdate={setEngineSpeed} />
+
+      {engines.map(engine => <EngineSpeed key={engine.id} onUpdate={(speed) => dispatchUpdateEngine(engine.id, { speed })} value={engine.speed} />)}
+
     </div>
   )
 }
+
+const mapState = (state) => ({
+  tiles: Array.from(state.tiles.byPosition.values()),
+  engines: Array.from(state.engines.byId.values())
+})
+
+const mapDispatch = (dispatch) => ({
+  dispatchUpdateTile: (...args) => dispatch(updateTile(...args)),
+  dispatchInsertTile: (...args) => dispatch(insertTile(...args)),
+  dispatchUpdateEngine: (...args) => dispatch(updateEngine(...args)),
+})
+
+
+export default connect(mapState, mapDispatch)(PlaySpace)

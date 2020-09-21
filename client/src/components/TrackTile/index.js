@@ -4,17 +4,16 @@ import Curve from './Curve'
 import YLeft from './YLeft'
 import YRight from './YRight'
 import { TILE_WIDTH, TILE_HEIGHT } from '../../constants'
-import Engine from '../Engine'
 
 const noop = () => {}
 
-export default ({ id, type, rotation, position, updateTile=noop }) => {
+export default ({ type, rotation, position, updateTile=noop }) => {
   const [ x, y ] = position
   const [ state, setState ] = useState({
     hovering: false
   })
 
-  const rotateTile = () => updateTile({ id, rotation: (rotation+90) % 360})
+  const rotateTile = () => updateTile(position, { rotation: (rotation+90) % 360})
 
   const Track = (type === 'STRAIGHT') ? Straight
               : (type === "CURVE")    ? Curve

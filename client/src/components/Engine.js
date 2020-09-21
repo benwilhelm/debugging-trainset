@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 
-export default ({position}) => {
-  const [ x, y ] = position
+export default ({coordinates}) => {
+  const [ x, y ] = coordinates
 
   return <svg>
     <circle cx={x} cy={y} r={10} />
