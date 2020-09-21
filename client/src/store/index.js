@@ -17,7 +17,7 @@ const rootReducer = combineReducers({
 export default createStore(rootReducer)
 
 export { updateTile, insertTile, indexFromPosition } from './tiles'
-export { updateEngine } from './engines'
+export { updateEngine, engineTravel } from './engines'
 
 export const selectEngineById = (state, id) => selectEngineFromSlice(state.engines, id)
 export const selectAllEngines = (state) => selectAllEnginesFromSlice(state.engines)
