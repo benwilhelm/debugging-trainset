@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid'
 import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
 import Engine from './Engine'
+import EngineSpeed from './EngineSpeed'
 import { loop as trackSetData } from '../data/trackset'
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants'
 import useAnimationFrame from '../hooks/useAnimationFrame'
@@ -98,6 +99,7 @@ function pageCoordsToSvgCoords(pageCoords, svg) {
 export default () => {
   const [tiles, setTiles] = useState(trackSetData)
   const [ enginePosition, setEnginePosition ] = useState([240, 210])
+  const [ engineSpeed, setEngineSpeed ] = useState(0)
   const [viewBox, setViewBox] = useState([0, 0, 800, 400])
   const [ tileCoords, setTileCoords ] = useState([0, 0])
   const svgEl = useRef(null)
@@ -142,47 +144,53 @@ export default () => {
     // setTiles is a hack to get the current tiles array,
     // rather than freezing it due to closure
     setTiles(tiles => {
-      setEnginePosition((currentPosition) => {
-        const [ x, y ] = currentPosition
-        const tileCoords = [
-          Math.floor(x / TILE_WIDTH),
-          Math.floor(y / TILE_HEIGHT)
-        ]
-        const overTile = tiles.find(t => t.position[0] === tileCoords[0] && t.position[1] === tileCoords[1])
-        if (!overTile) {
-          return [ x, y ]
-        }
-
-        if (tilePosition.current.tileId !== overTile.id) {
-          tilePosition.current = {
-            tileId: overTile.id,
-            travelFunction: getTravelFunction(overTile, [x, y]),
-            step: 0
+      setEngineSpeed((currentSpeed) => {
+        setEnginePosition((currentPosition) => {
+          const [ x, y ] = currentPosition
+          const tileCoords = [
+            Math.floor(x / TILE_WIDTH),
+            Math.floor(y / TILE_HEIGHT)
+          ]
+          const overTile = tiles.find(t => t.position[0] === tileCoords[0] && t.position[1] === tileCoords[1])
+          if (!overTile) {
+            return [ x, y ]
           }
-        }
 
-        tilePosition.current.step += 1
-        return tilePosition.current.travelFunction(tilePosition.current.step)
+          if (tilePosition.current.tileId !== overTile.id) {
+            tilePosition.current = {
+              tileId: overTile.id,
+              travelFunction: getTravelFunction(overTile, [x, y]),
+              step: 0
+            }
+          }
+
+          tilePosition.current.step += (deltaTime / 1000) * currentSpeed
+          return tilePosition.current.travelFunction(tilePosition.current.step)
+        })
+
+        return currentSpeed
       })
-
       // returning  original tiles array
       return tiles
     })
   })
 
   return (
-    <svg ref={svgEl}
-         style={{border: '1px solid blue'}}
-         viewBox={viewBox.join(' ')} xmlns="http://www.w3.org/2000/svg"
-         onMouseMove={handleMouseMove}
-         onWheel={handleMouseWheel}
-    >
-      <HoverIndicator tileCoords={tileCoords} insertTile={insertTile} />
-      {tiles.map((tile) => (
-        <TrackTile key={tile.id} {...tile} updateTile={updateTile} />
-      ))}
+    <div>
+      <svg ref={svgEl}
+           style={{border: '1px solid blue'}}
+           viewBox={viewBox.join(' ')} xmlns="http://www.w3.org/2000/svg"
+           onMouseMove={handleMouseMove}
+           onWheel={handleMouseWheel}
+      >
+        <HoverIndicator tileCoords={tileCoords} insertTile={insertTile} />
+        {tiles.map((tile) => (
+          <TrackTile key={tile.id} {...tile} updateTile={updateTile} />
+        ))}
 
-      <Engine position={enginePosition} />
-    </svg>
+        <Engine position={enginePosition} />
+      </svg>
+      <EngineSpeed onUpdate={setEngineSpeed} />
+    </div>
   )
 }
