@@ -7,13 +7,13 @@ import { TILE_WIDTH, TILE_HEIGHT } from '../constants'
 import useAnimationFrame from '../hooks/useAnimationFrame'
 import store, {
   updateTile,
+  toggleSegment,
   insertTile,
   updateEngine,
   engineTravel,
-  indexFromPosition,
   selectAllEngines,
-  selectAllTiles,
   selectTileByPosition,
+  selectTileByCoordinates,
 } from '../store'
 import { connect } from 'react-redux'
 
@@ -27,11 +27,18 @@ function pageCoordsToSvgCoords(pageCoords, svg) {
   return [ x, y ]
 }
 
-const PlaySpace = ({ tiles, engines, dispatchUpdateTile, dispatchInsertTile, dispatchUpdateEngine, dispatchEngineTravel }) => {
+const PlaySpace = ({
+  tiles,
+  engines,
+  dispatchUpdateTile,
+  dispatchToggleSegment,
+  dispatchInsertTile,
+  dispatchUpdateEngine,
+  dispatchEngineTravel
+}) => {
   const [viewBox, setViewBox] = useState([0, 0, 800, 400])
   const [ tileCoords, setTileCoords ] = useState([0, 0])
   const svgEl = useRef(null)
-  const tilePosition = useRef({ tileId: null, step: 0 })
 
   const handleMouseMove = (evt) => {
     const [x, y] = pageCoordsToSvgCoords([evt.clientX, evt.clientY], svgEl.current)
@@ -62,17 +69,7 @@ const PlaySpace = ({ tiles, engines, dispatchUpdateTile, dispatchInsertTile, dis
   useAnimationFrame((deltaTime) => {
     const state = store.getState()
     selectAllEngines(state).forEach(engine => {
-      const [ x, y ] = engine.coordinates
-      const tileCoords = [
-        Math.floor(x / TILE_WIDTH),
-        Math.floor(y / TILE_HEIGHT)
-      ]
-      const overTile = selectTileByPosition(state, tileCoords)
-      if (!overTile) {
-        return
-      }
-
-      dispatchEngineTravel(engine, overTile, deltaTime)
+      dispatchEngineTravel(engine, deltaTime)
     })
   })
 
@@ -86,7 +83,7 @@ const PlaySpace = ({ tiles, engines, dispatchUpdateTile, dispatchInsertTile, dis
       >
         <HoverIndicator tileCoords={tileCoords} insertTile={dispatchInsertTile} />
         {tiles.map((tile) => (
-          <TrackTile key={tile.position} {...tile} updateTile={dispatchUpdateTile} />
+          <TrackTile key={tile.position} tile={tile} updateTile={dispatchUpdateTile} toggleSegment={dispatchToggleSegment} />
         ))}
 
         {engines.map(engine => <Engine key={engine.id} coordinates={engine.coordinates} />)}
@@ -99,12 +96,13 @@ const PlaySpace = ({ tiles, engines, dispatchUpdateTile, dispatchInsertTile, dis
 }
 
 const mapState = (state) => ({
-  tiles: Array.from(state.tiles.byPosition.values()),
-  engines: Array.from(state.engines.byId.values())
+  tiles: Array.from(state.playspace.tiles.values()),
+  engines: Array.from(state.playspace.engines.values())
 })
 
 const mapDispatch = (dispatch) => ({
   dispatchUpdateTile: (...args) => dispatch(updateTile(...args)),
+  dispatchToggleSegment: (...args) => dispatch(toggleSegment(...args)),
   dispatchInsertTile: (...args) => dispatch(insertTile(...args)),
   dispatchUpdateEngine: (...args) => dispatch(updateEngine(...args)),
   dispatchEngineTravel: (...args) => dispatch(engineTravel(...args))

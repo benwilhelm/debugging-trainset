@@ -11,6 +11,15 @@ export const loop =  [
   { id: "8", type: "CURVE",    rotation: 180, position: [ 2, 0 ]},
 ]
 
+export const branching = [
+  { id: "1", type: "STRAIGHT", rotation:  90, position: [ 2, 1 ]},
+  { id: "2", type: "YLEFT",    rotation: 270, position: [ 3, 1 ]},
+  { id: "3", type: "YRIGHT",   rotation: 270, position: [ 4, 1 ]},
+  { id: "3", type: "CURVE",   rotation:   90, position: [ 1, 1 ]},
+  { id: "3", type: "CURVE",   rotation:  270, position: [ 3, 0 ]},
+
+]
+
 export const straight = [
   { id: "1", type: "STRAIGHT", rotation:   0, position: [ 2, 1 ]},
   { id: "2", type: "STRAIGHT", rotation: 180, position: [ 2, 2 ]},

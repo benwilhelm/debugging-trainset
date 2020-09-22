@@ -39,7 +39,7 @@ export default ({tileCoords, insertTile=noop}) => {
           <YLeft rotation={0} />
         </g>
 
-        <g onClick={() => insertTile(newTile("YLEFT"))}
+        <g onClick={() => insertTile(newTile("YRIGHT"))}
            transform={`translate(${1.4*TILE_WIDTH}, ${1.4*TILE_HEIGHT})`}
         >
           <YRight rotation={0} />

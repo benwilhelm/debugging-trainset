@@ -1,26 +1,24 @@
 import { combineReducers, createStore } from 'redux'
 
-import tilesReducer, {
-  selectTileByPosition as selectTileFromSlice,
-  selectAllTiles as selectAllTilesFromSlice
-} from './tiles'
-import enginesReducer, {
+import playspaceReducer, {
+  selectTileByPosition as selectTileByPositionFromSlice,
+  selectTileByCoordinates as selectTileByCoordinatesFromSlice,
+  selectAllTiles as selectAllTilesFromSlice,
   selectEngineById as selectEngineFromSlice,
   selectAllEngines as selectAllEnginesFromSlice
-} from './engines'
+} from './playspace'
 
 const rootReducer = combineReducers({
-  tiles: tilesReducer,
-  engines: enginesReducer
+  playspace: playspaceReducer,
 })
 
 export default createStore(rootReducer)
 
-export { updateTile, insertTile, indexFromPosition } from './tiles'
-export { updateEngine, engineTravel } from './engines'
+export { updateTile, toggleSegment, insertTile, indexFromPosition, updateEngine, engineTravel } from './playspace'
 
-export const selectEngineById = (state, id) => selectEngineFromSlice(state.engines, id)
-export const selectAllEngines = (state) => selectAllEnginesFromSlice(state.engines)
+export const selectEngineById = (state, id) => selectEngineFromSlice(state.playspace, id)
+export const selectAllEngines = (state) => selectAllEnginesFromSlice(state.playspace)
 
-export const selectTileByPosition = (state, position) => selectTileFromSlice(state.tiles, position)
-export const selectAllTiles = (state) => selectAllTilesFromSlice(state.tiles)
+export const selectTileByPosition = (state, position) => selectTileByPositionFromSlice(state.playspace, position)
+export const selectTileByCoordinates = (state, coords) => selectTileByCoordinatesFromSlice(state.playspace, coords)
+export const selectAllTiles = (state) => selectAllTilesFromSlice(state.playspace)
