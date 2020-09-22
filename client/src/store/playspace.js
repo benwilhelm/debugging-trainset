@@ -6,6 +6,7 @@ export const UPDATE_ENGINE = "UPDATE_ENGINE"
 export const ENGINE_TRAVEL = "ENGINE_TRAVEL"
 export const UPDATE_TILE = "UPDATE_TILE"
 export const INSERT_TILE = "INSERT_TILE"
+export const DELETE_TILE = "DELETE_TILE"
 export const TOGGLE_SEGMENT = "TOGGLE_SEGMENT"
 
 const initialState = {
@@ -45,6 +46,11 @@ export const toggleSegment = (position) => ({
 
 export const insertTile = (tile) => ({
   type: INSERT_TILE,
+  payload: tile
+})
+
+export const deleteTile = (tile) => ({
+  type: DELETE_TILE,
   payload: tile
 })
 
@@ -116,6 +122,13 @@ const actionHandlers = {
     tile.selectedSegment = (tile.selectedSegment >= tile.segments.length - 1) ? 0
                          : tile.selectedSegment + 1
     return actionHandlers[UPDATE_TILE](state, { payload: tile })
+  },
+  [DELETE_TILE]: (state, { payload }) => {
+    const tile = payload
+    const index = indexFromPosition(tile.position)
+    const tiles = new Map(state.tiles)
+    tiles.delete(index)
+    return { ...state, tiles }
   }
 
 }

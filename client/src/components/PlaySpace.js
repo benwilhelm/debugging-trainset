@@ -9,6 +9,7 @@ import store, {
   updateTile,
   toggleSegment,
   insertTile,
+  deleteTile,
   updateEngine,
   engineTravel,
   selectAllEngines,
@@ -33,6 +34,7 @@ const PlaySpace = ({
   dispatchUpdateTile,
   dispatchToggleSegment,
   dispatchInsertTile,
+  dispatchDeleteTile,
   dispatchUpdateEngine,
   dispatchEngineTravel
 }) => {
@@ -83,7 +85,12 @@ const PlaySpace = ({
       >
         <HoverIndicator tileCoords={tileCoords} insertTile={dispatchInsertTile} />
         {tiles.map((tile) => (
-          <TrackTile key={tile.position} tile={tile} updateTile={dispatchUpdateTile} toggleSegment={dispatchToggleSegment} />
+          <TrackTile key={tile.position}
+            tile={tile}
+            updateTile={dispatchUpdateTile}
+            toggleSegment={dispatchToggleSegment}
+            deleteTile={dispatchDeleteTile}
+          />
         ))}
 
         {engines.map(engine => <Engine key={engine.id} coordinates={engine.coordinates} />)}
@@ -105,7 +112,8 @@ const mapDispatch = (dispatch) => ({
   dispatchToggleSegment: (...args) => dispatch(toggleSegment(...args)),
   dispatchInsertTile: (...args) => dispatch(insertTile(...args)),
   dispatchUpdateEngine: (...args) => dispatch(updateEngine(...args)),
-  dispatchEngineTravel: (...args) => dispatch(engineTravel(...args))
+  dispatchEngineTravel: (...args) => dispatch(engineTravel(...args)),
+  dispatchDeleteTile: (...args) => dispatch(deleteTile(...args)),
 })
 
 

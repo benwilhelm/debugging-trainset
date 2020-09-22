@@ -1,6 +1,7 @@
 import React from 'react'
 import { TILE_WIDTH, TILE_HEIGHT} from '../constants'
 import { Straight, Curve, YLeft, YRight } from './TrackTile'
+import './HoverIndicator.css'
 
 const noop = () => {}
 

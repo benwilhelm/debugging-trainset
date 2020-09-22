@@ -3,15 +3,14 @@ import TileBg from './ShapePrimitives/TileBg'
 import Straight from './ShapePrimitives/StraightTrack'
 import Curve from './ShapePrimitives/CurvedTrack'
 import { TILE_WIDTH, TILE_HEIGHT } from '../../constants'
+import "./index.css"
 
 const noop = () => {}
 
-export default ({ tile, updateTile=noop, toggleSegment=noop }) => {
+export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop }) => {
   const { type, rotation, position, segments } = tile
   const [ x, y ] = position
-  const [ state, setState ] = useState({
-    hovering: false
-  })
+  const [ hovering, setHovering ] = useState(false)
 
   const rotateTile = () => updateTile(position, { rotation: (rotation+90) % 360})
 
@@ -20,39 +19,58 @@ export default ({ tile, updateTile=noop, toggleSegment=noop }) => {
   const sorted = [...unselected, selected]
 
   return (
-    <svg
+    <svg className="tile"
       x={x*TILE_WIDTH}
       y={y*TILE_HEIGHT}
-      onMouseEnter={() => setState({ hovering: true })}
-      onMouseLeave={() => setState({ hovering: false })}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
     >
       <g transform={`rotate(${rotation} ${TILE_WIDTH/2} ${TILE_HEIGHT/2})`}>
-        <TileBg />
+        <TileBg hovering={hovering} />
         {sorted.map((seg) => (
           (seg.type === 'STRAIGHT') ? <Straight key={`${tile.id}-${seg.type}`} rotation={seg.rotation} />
           : (seg.type === 'CURVE') ? <Curve key={`${tile.id}-${seg.type}`} rotation={seg.rotation} />
           : <></>
         ))}
+
+        {segments.length > 1 && hovering &&
+          <text className="tile-control"
+            x={TILE_WIDTH / 2}
+            y={10}
+            width={15}
+            height={15}
+            dominantBaseline='middle'
+            textAnchor='middle'
+            transform='rotate(90 50 10)'
+            onClick={() => toggleSegment(tile.position)}
+          >{'\u292e'}</text>
+        }
+
       </g>
 
 
-      {state.hovering && (
+      {hovering && (
         <>
-          <rect
-            x={TILE_WIDTH/2 - 10}
-            y={TILE_HEIGHT/2 - 10}
+          <text className="tile-control"
+            x={TILE_WIDTH/2}
+            y={TILE_HEIGHT/2}
             width={20}
             height={20}
+            dominantBaseline='middle'
+            textAnchor='middle'
             onClick={rotateTile}
-          />
+          >{'\u27f3'}</text>
 
-          <rect
-            x={10}
-            y={10}
+          <text className="tile-control"
+            x={TILE_WIDTH - 20}
+            y={TILE_HEIGHT - 20}
             width={20}
             height={20}
-            onClick={() => toggleSegment(tile.position)}
-          />
+            dominantBaseline='middle'
+            textAnchor='middle'
+            onClick={() => deleteTile(tile)}
+          >{'\u274c'}</text>
+
         </>
       )}
     </svg>

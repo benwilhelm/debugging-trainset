@@ -13,7 +13,7 @@ export default ({ rotation=0 }) => (
     <path d={`
       M ${TILE_WIDTH/2} 0
       A ${TILE_HEIGHT/2} ${TILE_HEIGHT/2} 0 0 1 ${0} ${TILE_HEIGHT/2}`}
-      stroke="black"
+      stroke="#555555"
       fill="none"
     />
   </g>

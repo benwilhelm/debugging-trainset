@@ -14,7 +14,10 @@ const rootReducer = combineReducers({
 
 export default createStore(rootReducer)
 
-export { updateTile, toggleSegment, insertTile, indexFromPosition, updateEngine, engineTravel } from './playspace'
+export {
+  updateTile, deleteTile, toggleSegment, insertTile,
+  indexFromPosition, updateEngine, engineTravel
+} from './playspace'
 
 export const selectEngineById = (state, id) => selectEngineFromSlice(state.playspace, id)
 export const selectAllEngines = (state) => selectAllEnginesFromSlice(state.playspace)

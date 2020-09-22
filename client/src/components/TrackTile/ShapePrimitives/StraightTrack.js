@@ -16,7 +16,7 @@ export default ({rotation=0}) => (
       y1={0}
       x2={TILE_WIDTH/2}
       y2={TILE_HEIGHT}
-      stroke="black"
+      stroke="#555555"
     />
   </g>
 )
