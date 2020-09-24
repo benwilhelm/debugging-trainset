@@ -1,4 +1,5 @@
-import { combineReducers, createStore } from 'redux'
+import { combineReducers, createStore, applyMiddleware, compose } from 'redux'
+import thunk from 'redux-thunk'
 
 import playspaceReducer, {
   selectTileByPosition as selectTileByPositionFromSlice,
@@ -14,11 +15,15 @@ const rootReducer = combineReducers({
 
 export default createStore(
   rootReducer,
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  compose(
+    applyMiddleware(thunk),
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  )
 )
 
 export {
   updateTile, deleteTile, toggleTileSegment, insertTile, rotateTile,
+  fetchTiles, persistTileAction, addEngineToTile,
   updateEngine, engineTravel
 } from './playspace'
 

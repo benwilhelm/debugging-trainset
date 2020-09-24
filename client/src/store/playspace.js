@@ -1,28 +1,23 @@
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants'
-import { branching as trackset } from '../data/trackset'
-import { coordinatesInSameTile } from '../util'
 import Tile from '../models/tile'
+import Engine from '../models/engine'
+import { saveTileData, loadTileData } from '../services/persistence'
 
 export const UPDATE_ENGINE = "UPDATE_ENGINE"
 export const ENGINE_TRAVEL = "ENGINE_TRAVEL"
+export const INSERT_ENGINE = "INSERT_ENGINE"
+
 export const UPDATE_TILE = "UPDATE_TILE"
 export const INSERT_TILE = "INSERT_TILE"
 export const DELETE_TILE = "DELETE_TILE"
+export const LOAD_TILES = "LOAD_TILES"
 export const TOGGLE_SEGMENT = "TOGGLE_SEGMENT"
 
 
 
 const initialState = {
-  engines: trackset.engines.reduce((map, engine) => {
-    map[engine.id] = engine
-    return map
-  }, {}),
-
-  tiles: trackset.tiles.reduce((map, tile) => {
-    const index = tile.position.toString()
-    map[index] = new Tile(tile)
-    return map
-  }, {})
+  engines: {},
+  tiles: {}
 }
 
 // ACTION CREATORS
@@ -35,7 +30,7 @@ export const updateEngine = (id, props) => ({
 
 export const engineTravel = (engine, deltaTime) => ({
   type: ENGINE_TRAVEL,
-  payload: { engine, deltaTime}
+  payload: { engine, deltaTime }
 })
 
 export const stopEngine = (engineId) => ({
@@ -43,9 +38,35 @@ export const stopEngine = (engineId) => ({
   payload: { id: engineId, speed: 0 }
 })
 
-export const updateTile = (position, props) => ({
+export const addEngineToTile = (tile) => {
+  return {
+    type: INSERT_ENGINE,
+    payload: {
+      coordinates: tile.travelFunction(10, tile.from),
+      step: 10,
+      // entryPoint: tile.from
+    }
+  }
+}
+
+export const persistTiles = () => async (dispatch, getState) => {
+  const tiles = Object.values(getState().playspace.tiles)
+  await saveTileData(tiles)
+}
+
+export const persistTileAction = (tile, actionCreator) => async (dispatch) => {
+  dispatch(actionCreator(tile))
+  return dispatch(persistTiles())
+}
+
+export const fetchTiles = () => async (dispatch) => {
+  const tiles = (await loadTileData()) || []
+  dispatch(loadTiles(tiles))
+}
+
+export const updateTile = (tile) => ({
   type: UPDATE_TILE,
-  payload:  { ...props, position }
+  payload: tile
 })
 
 export const rotateTile = (tile) => ({
@@ -76,11 +97,22 @@ export const deleteTile = (tile) => ({
   payload: tile
 })
 
+export const loadTiles = (tiles) => ({
+  type: LOAD_TILES,
+  payload: tiles
+})
+
 
 const actionHandlers = {
+  [INSERT_ENGINE]: (state, { payload }) => {
+    const engine = new Engine(payload)
+    const engines = { ...state.engines }
+    engines[engine.id] = engine
+    return { ...state, engines }
+  },
   [UPDATE_ENGINE]: (state, {payload}) => {
     const existingEngine = selectEngineById(state, payload.id)
-    const updatedEngine = { ...existingEngine, ...payload }
+    const updatedEngine = new Engine({ ...existingEngine, ...payload })
     return { ...state, engines: {
       ...state.engines,
       [payload.id]: updatedEngine
@@ -140,6 +172,15 @@ const actionHandlers = {
     const index = tile.position.toString()
     const tiles = {...state.tiles}
     delete tiles[index]
+    return { ...state, tiles }
+  },
+
+  [LOAD_TILES]: (state, { payload }) => {
+    const tiles = payload.reduce((map, tile) => {
+      const index = tile.position.toString()
+      map[index] = new Tile(tile)
+      return map
+    }, {})
     return { ...state, tiles }
   }
 

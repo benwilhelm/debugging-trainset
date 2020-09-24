@@ -18,6 +18,16 @@ export default class Tile {
     return segment.totalSteps
   }
 
+  get from() {
+    const segment = this.segments[this.selectedSegment]
+    return segment.from
+  }
+
+  get to() {
+    const segment = this.segments[this.selectedSegment]
+    return segment.to
+  }
+
   closestEntryPoint(coordinates) {
     const tileMidpoint = [
       (this.position[0] * TILE_WIDTH) + (TILE_WIDTH/2),
@@ -49,7 +59,6 @@ export default class Tile {
       throw new Error("Invalid Entry Point")
 
     const segment = this.segments[this.selectedSegment]
-
     // going through it 'backwards'
     if (validEntry === -1)
       step = reflectOver(step, (segment.totalSteps / 2))

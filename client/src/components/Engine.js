@@ -1,8 +1,9 @@
 import React from 'react'
 import './Engine.css'
 
-export default ({coordinates}) => {
-  const [ x, y ] = coordinates
+export default ({ engine, dispatchEngineTravel }) => {
+
+  const [ x, y ] = engine.coordinates
 
   return <svg className='engine'>
     <circle cx={x} cy={y} r={10} />

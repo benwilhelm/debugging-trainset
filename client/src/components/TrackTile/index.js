@@ -7,8 +7,8 @@ import "./index.css"
 
 const noop = () => {}
 
-export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, rotateTile=noop }) => {
-  const { type, rotation, position, segments } = tile
+export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, rotateTile=noop, insertEngine=noop }) => {
+  const { rotation, position, segments } = tile
   const [ x, y ] = position
   const [ hovering, setHovering ] = useState(false)
 
@@ -68,6 +68,16 @@ export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, ro
             textAnchor='middle'
             onClick={() => deleteTile(tile)}
           >{'\u274c'}</text>
+
+          <text className="tile-control"
+            x={20}
+            y={TILE_HEIGHT - 20}
+            width={20}
+            height={20}
+            dominantBaseline='middle'
+            textAnchor='middle'
+            onClick={() => insertEngine(tile)}
+          >+En</text>
 
         </>
       )}

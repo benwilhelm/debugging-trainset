@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
 import Engine from './Engine'
@@ -6,17 +6,17 @@ import EngineSpeed from './EngineSpeed'
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants'
 import useAnimationFrame from '../hooks/useAnimationFrame'
 import store, {
-  updateTile,
   toggleTileSegment,
   insertTile,
   deleteTile,
   rotateTile,
+  fetchTiles,
+  persistTileAction,
+  addEngineToTile,
   updateEngine,
   engineTravel,
   selectAllEngines,
   selectAllTiles,
-  selectTileByPosition,
-  selectTileByCoordinates,
 } from '../store'
 import { connect } from 'react-redux'
 
@@ -33,17 +33,22 @@ function pageCoordsToSvgCoords(pageCoords, svg) {
 const PlaySpace = ({
   tiles,
   engines,
-  dispatchUpdateTile,
   dispatchToggleSegment,
   dispatchInsertTile,
   dispatchDeleteTile,
   dispatchRotateTile,
+  dispatchFetchTiles,
+  dispatchAddEngineToTile,
   dispatchUpdateEngine,
   dispatchEngineTravel
 }) => {
   const [viewBox, setViewBox] = useState([0, 0, 800, 400])
   const [ tileCoords, setTileCoords ] = useState([0, 0])
   const svgEl = useRef(null)
+
+  useEffect(() => {
+    dispatchFetchTiles()
+  }, [dispatchFetchTiles])
 
   const handleMouseMove = (evt) => {
     const [x, y] = pageCoordsToSvgCoords([evt.clientX, evt.clientY], svgEl.current)
@@ -90,14 +95,14 @@ const PlaySpace = ({
         {tiles.map((tile) => (
           <TrackTile key={tile.position}
             tile={tile}
-            updateTile={dispatchUpdateTile}
             toggleSegment={dispatchToggleSegment}
             deleteTile={dispatchDeleteTile}
             rotateTile={dispatchRotateTile}
+            insertEngine={dispatchAddEngineToTile}
           />
         ))}
 
-        {engines.map(engine => <Engine key={`engine-${engine.id}`} coordinates={engine.coordinates} />)}
+        {engines.map(engine => <Engine key={`engine-${engine.id}`} engine={engine} />)}
       </svg>
 
       {engines.map(engine => <EngineSpeed key={`throttle-${engine.id}`} onUpdate={(speed) => dispatchUpdateEngine(engine.id, { speed })} value={engine.speed} />)}
@@ -112,10 +117,11 @@ const mapState = (state) => ({
 })
 
 const mapDispatch = (dispatch) => ({
-  dispatchUpdateTile: (...args) => dispatch(updateTile(...args)),
-  dispatchDeleteTile: (...args) => dispatch(deleteTile(...args)),
-  dispatchInsertTile: (...args) => dispatch(insertTile(...args)),
-  dispatchRotateTile: (...args) => dispatch(rotateTile(...args)),
+  dispatchDeleteTile: (tile) => dispatch(persistTileAction(tile, deleteTile)),
+  dispatchInsertTile: (tile) => dispatch(persistTileAction(tile, insertTile)),
+  dispatchRotateTile: (tile) => dispatch(persistTileAction(tile, rotateTile)),
+  dispatchAddEngineToTile: (tile) => dispatch(addEngineToTile(tile)),
+  dispatchFetchTiles: (...args) => dispatch(fetchTiles(...args)),
   dispatchToggleSegment: (...args) => dispatch(toggleTileSegment(...args)),
   dispatchUpdateEngine: (...args) => dispatch(updateEngine(...args)),
   dispatchEngineTravel: (...args) => dispatch(engineTravel(...args)),
