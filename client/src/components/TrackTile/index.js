@@ -7,12 +7,10 @@ import "./index.css"
 
 const noop = () => {}
 
-export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop }) => {
+export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, rotateTile=noop }) => {
   const { type, rotation, position, segments } = tile
   const [ x, y ] = position
   const [ hovering, setHovering ] = useState(false)
-
-  const rotateTile = () => updateTile(position, { rotation: (rotation+90) % 360})
 
   const selected = segments[tile.selectedSegment]
   const unselected = segments.filter((seg, idx) => idx !== tile.selectedSegment)
@@ -42,7 +40,7 @@ export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop }) 
             dominantBaseline='middle'
             textAnchor='middle'
             transform='rotate(90 50 10)'
-            onClick={() => toggleSegment(tile.position)}
+            onClick={() => toggleSegment(tile)}
           >{'\u292e'}</text>
         }
 
@@ -58,7 +56,7 @@ export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop }) 
             height={20}
             dominantBaseline='middle'
             textAnchor='middle'
-            onClick={rotateTile}
+            onClick={() => rotateTile(tile)}
           >{'\u27f3'}</text>
 
           <text className="tile-control"

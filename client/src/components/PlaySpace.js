@@ -7,9 +7,10 @@ import { TILE_WIDTH, TILE_HEIGHT } from '../constants'
 import useAnimationFrame from '../hooks/useAnimationFrame'
 import store, {
   updateTile,
-  toggleSegment,
+  toggleTileSegment,
   insertTile,
   deleteTile,
+  rotateTile,
   updateEngine,
   engineTravel,
   selectAllEngines,
@@ -36,6 +37,7 @@ const PlaySpace = ({
   dispatchToggleSegment,
   dispatchInsertTile,
   dispatchDeleteTile,
+  dispatchRotateTile,
   dispatchUpdateEngine,
   dispatchEngineTravel
 }) => {
@@ -91,6 +93,7 @@ const PlaySpace = ({
             updateTile={dispatchUpdateTile}
             toggleSegment={dispatchToggleSegment}
             deleteTile={dispatchDeleteTile}
+            rotateTile={dispatchRotateTile}
           />
         ))}
 
@@ -110,11 +113,12 @@ const mapState = (state) => ({
 
 const mapDispatch = (dispatch) => ({
   dispatchUpdateTile: (...args) => dispatch(updateTile(...args)),
-  dispatchToggleSegment: (...args) => dispatch(toggleSegment(...args)),
+  dispatchDeleteTile: (...args) => dispatch(deleteTile(...args)),
   dispatchInsertTile: (...args) => dispatch(insertTile(...args)),
+  dispatchRotateTile: (...args) => dispatch(rotateTile(...args)),
+  dispatchToggleSegment: (...args) => dispatch(toggleTileSegment(...args)),
   dispatchUpdateEngine: (...args) => dispatch(updateEngine(...args)),
   dispatchEngineTravel: (...args) => dispatch(engineTravel(...args)),
-  dispatchDeleteTile: (...args) => dispatch(deleteTile(...args)),
 })
 
 

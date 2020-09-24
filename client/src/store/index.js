@@ -18,8 +18,8 @@ export default createStore(
 )
 
 export {
-  updateTile, deleteTile, toggleSegment, insertTile,
-  indexFromPosition, updateEngine, engineTravel
+  updateTile, deleteTile, toggleTileSegment, insertTile, rotateTile,
+  updateEngine, engineTravel
 } from './playspace'
 
 export const selectEngineById = (state, id) => selectEngineFromSlice(state.playspace, id)

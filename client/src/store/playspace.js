@@ -48,9 +48,22 @@ export const updateTile = (position, props) => ({
   payload:  { ...props, position }
 })
 
-export const toggleSegment = (position) => ({
-  type: TOGGLE_SEGMENT,
-  payload: { position }
+export const rotateTile = (tile) => ({
+  type: UPDATE_TILE,
+  payload: {
+    position: tile.position,
+    rotation: (tile.rotation + 90) % 360
+  }
+})
+
+export const toggleTileSegment = (tile) => ({
+  type: UPDATE_TILE,
+  payload: {
+    position: tile.position,
+    selectedSegment: tile.selectedSegment < tile.segments.length - 1
+                   ? tile.selectedSegment + 1
+                   : 0
+  }
 })
 
 export const insertTile = (tile) => ({
@@ -122,16 +135,11 @@ const actionHandlers = {
     return {...state, tiles }
   },
 
-  [TOGGLE_SEGMENT]: (state, { payload }) => {
-    const tile = selectTileByPosition(state, payload.position)
-    tile.selectedSegment = (tile.selectedSegment >= tile.segments.length - 1) ? 0
-                         : tile.selectedSegment + 1
-    return actionHandlers[UPDATE_TILE](state, { payload: tile })
-  },
   [DELETE_TILE]: (state, { payload }) => {
     const tile = payload
-    const index = indexFromPosition(tile.position)
-    const { index:deleted, ...tiles } = state.tiles
+    const index = tile.position.toString()
+    const tiles = {...state.tiles}
+    delete tiles[index]
     return { ...state, tiles }
   }
 
@@ -169,13 +177,4 @@ export const selectTileByCoordinates = (state, [x, y]) => {
 
 export const selectAllTiles = (state) => {
   return Object.values(state.tiles)
-}
-
-
-
-// UTILITY
-//==========
-
-export function indexFromPosition([x, y]){
-  return `${+x}, ${+y}`
 }
