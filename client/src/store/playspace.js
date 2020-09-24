@@ -1,5 +1,5 @@
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants'
-import { straight as tiles } from '../data/trackset'
+import { branching as trackset } from '../data/trackset'
 import { coordinatesInSameTile } from '../util'
 import Tile from '../models/tile'
 
@@ -10,16 +10,19 @@ export const INSERT_TILE = "INSERT_TILE"
 export const DELETE_TILE = "DELETE_TILE"
 export const TOGGLE_SEGMENT = "TOGGLE_SEGMENT"
 
-const initialState = {
-  engines: new Map([
-    ["A", { id: "A", coordinates: [ 240, 110 ], speed: 0, step: 0 }]
-  ]),
 
-  tiles: tiles.reduce((map, tile) => {
-    const index = tile.position.toString()
-    map.set(index, new Tile(tile))
+
+const initialState = {
+  engines: trackset.engines.reduce((map, engine) => {
+    map[engine.id] = engine
     return map
-  }, new Map())
+  }, {}),
+
+  tiles: trackset.tiles.reduce((map, tile) => {
+    const index = tile.position.toString()
+    map[index] = new Tile(tile)
+    return map
+  }, {})
 }
 
 // ACTION CREATORS
@@ -33,6 +36,11 @@ export const updateEngine = (id, props) => ({
 export const engineTravel = (engine, deltaTime) => ({
   type: ENGINE_TRAVEL,
   payload: { engine, deltaTime}
+})
+
+export const stopEngine = (engineId) => ({
+  type: UPDATE_ENGINE,
+  payload: { id: engineId, speed: 0 }
 })
 
 export const updateTile = (position, props) => ({
@@ -60,45 +68,42 @@ const actionHandlers = {
   [UPDATE_ENGINE]: (state, {payload}) => {
     const existingEngine = selectEngineById(state, payload.id)
     const updatedEngine = { ...existingEngine, ...payload }
-    const engines = new Map(state.engines)
-    engines.set(payload.id, updatedEngine)
-    return { ...state, engines }
+    return { ...state, engines: {
+      ...state.engines,
+      [payload.id]: updatedEngine
+    } }
   },
   [ENGINE_TRAVEL]: (state, {payload}) => {
     const {engine, deltaTime} = payload
     const tile = selectTileByCoordinates(state, engine.coordinates)
-    const referencePoint = engine.entryPoint || tile.getReferencePoint(engine.coordinates, engine.speed)
-    const step = engine.step + ((deltaTime/1000) * engine.speed)
+    const step = engine.step + (deltaTime/1000 * engine.speed)
+    const referencePoint = engine.entryPoint || tile.closestEntryPoint(engine.coordinates)
     const nextCoordinates = tile.travelFunction(step, referencePoint)
-    const nextTile = selectTileByCoordinates(state, nextCoordinates)
-    if (!nextTile) {
-      return actionHandlers[UPDATE_ENGINE](state, { payload: {
-        id: engine.id,
-        speed: 0
-      }})
-    }
+    if (step > tile.totalSteps || step < 0) {
+      const nextTile = selectTileByCoordinates(state, nextCoordinates)
+      if (!nextTile) {
+        return reducer(state, stopEngine(engine.id))
+      }
 
-    if (tile.id === nextTile.id) {
-      return actionHandlers[UPDATE_ENGINE](state, { payload: {
+      const nextReferencePoint = nextTile.getReferencePoint(nextCoordinates, engine.speed)
+      if (!nextReferencePoint) {
+        return reducer(state, stopEngine(engine.id))
+      }
+
+      return reducer(state, updateEngine(engine.id, {
         id: engine.id,
         coordinates: nextCoordinates,
-        step,
-      }})
-    }
-
-    const nextReferencePoint = nextTile.getReferencePoint(nextCoordinates, engine.speed)
-    if (!nextReferencePoint) {
-      return actionHandlers[UPDATE_ENGINE](state, { payload: {
-        id: engine.id,
-        speed: 0
-      }})
+        entryPoint: nextReferencePoint,
+        step: (step > 0) ? step - tile.totalSteps
+                         : nextTile.totalSteps - step
+      }))
     }
 
     return actionHandlers[UPDATE_ENGINE](state, { payload: {
       id: engine.id,
       coordinates: nextCoordinates,
-      entryPoint: nextReferencePoint,
-      step: 0,
+      entryPoint: referencePoint,
+      step
     }})
   },
 
@@ -106,14 +111,16 @@ const actionHandlers = {
     const existingTile = selectTileByPosition(state, payload.position)
     const updatedTile = new Tile({...existingTile, ...payload })
     const index = updatedTile.position.toString()
-    const tiles = new Map(state.tiles)
-    tiles.set(index, updatedTile)
+    const tiles = { ...state.tiles, [index]: updatedTile}
     return { ...state, tiles }
   },
 
-  // because we're using a Map to index the tiles by position, insert
-  // and update become the same operation. Neat!
-  [INSERT_TILE]: (...args) => actionHandlers[UPDATE_TILE](...args),
+  [INSERT_TILE]: (state, { payload }) => {
+    const tile = new Tile(payload)
+    const index = tile.position.toString()
+    const tiles = { ...state.tiles, [index]: tile }
+    return {...state, tiles }
+  },
 
   [TOGGLE_SEGMENT]: (state, { payload }) => {
     const tile = selectTileByPosition(state, payload.position)
@@ -124,14 +131,13 @@ const actionHandlers = {
   [DELETE_TILE]: (state, { payload }) => {
     const tile = payload
     const index = indexFromPosition(tile.position)
-    const tiles = new Map(state.tiles)
-    tiles.delete(index)
+    const { index:deleted, ...tiles } = state.tiles
     return { ...state, tiles }
   }
 
 }
 
-const reducer = (state=initialState, action) => {
+export default function reducer(state=initialState, action) {
   return actionHandlers.hasOwnProperty(action.type)
        ? actionHandlers[action.type](state, action)
        : state
@@ -142,15 +148,15 @@ const reducer = (state=initialState, action) => {
 // ===================
 
 export function selectEngineById(state, id) {
-  return state.engines.get(id)
+  return state.engines[id]
 }
 
 export function selectAllEngines(state) {
-  return Array.from(state.engines.values())
+  return Object.values(state.engines)
 }
 
 export const selectTileByPosition = (state, position) => {
-  return state.tiles.get(position.toString())
+  return state.tiles[position.toString()]
 }
 
 export const selectTileByCoordinates = (state, [x, y]) => {
@@ -162,10 +168,8 @@ export const selectTileByCoordinates = (state, [x, y]) => {
 }
 
 export const selectAllTiles = (state) => {
-  return Array.from(state.tiles.values())
+  return Object.values(state.tiles)
 }
-
-export default reducer
 
 
 

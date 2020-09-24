@@ -13,6 +13,7 @@ import store, {
   updateEngine,
   engineTravel,
   selectAllEngines,
+  selectAllTiles,
   selectTileByPosition,
   selectTileByCoordinates,
 } from '../store'
@@ -93,18 +94,18 @@ const PlaySpace = ({
           />
         ))}
 
-        {engines.map(engine => <Engine key={engine.id} coordinates={engine.coordinates} />)}
+        {engines.map(engine => <Engine key={`engine-${engine.id}`} coordinates={engine.coordinates} />)}
       </svg>
 
-      {engines.map(engine => <EngineSpeed key={engine.id} onUpdate={(speed) => dispatchUpdateEngine(engine.id, { speed })} value={engine.speed} />)}
+      {engines.map(engine => <EngineSpeed key={`throttle-${engine.id}`} onUpdate={(speed) => dispatchUpdateEngine(engine.id, { speed })} value={engine.speed} />)}
 
     </div>
   )
 }
 
 const mapState = (state) => ({
-  tiles: Array.from(state.playspace.tiles.values()),
-  engines: Array.from(state.playspace.engines.values())
+  tiles: selectAllTiles(state),
+  engines: selectAllEngines(state)
 })
 
 const mapDispatch = (dispatch) => ({

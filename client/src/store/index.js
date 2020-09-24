@@ -12,7 +12,10 @@ const rootReducer = combineReducers({
   playspace: playspaceReducer,
 })
 
-export default createStore(rootReducer)
+export default createStore(
+  rootReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+)
 
 export {
   updateTile, deleteTile, toggleSegment, insertTile,

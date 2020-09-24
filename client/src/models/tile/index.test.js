@@ -135,55 +135,5 @@ describe('Tile class', () => {
       const nextPosition = tile.travelFunction(0, 'negY')
       expect(nextPosition).toEqual([150, 300])
     })
-
-  })
-
-  describe('handoff between tiles', () => {
-    test('forward, no rotation', () => {
-      const tile1 = new Tile({ type: 'STRAIGHT', position: [0,0] })
-      const tile2 = new Tile({ type: 'STRAIGHT', position: [0,1] })
-
-      let step = TILE_HEIGHT - 1
-      let entryPoint = tile1.closestEntryPoint([ HALF_WIDTH, 0 ])
-      expect(entryPoint).toEqual('negY')
-
-      let nextCoordinates = tile1.travelFunction(step, entryPoint)
-      expect(nextCoordinates).toEqual([HALF_WIDTH, TILE_HEIGHT-1])
-
-      step = TILE_HEIGHT
-      nextCoordinates = tile1.travelFunction(step, entryPoint)
-      expect(nextCoordinates).toEqual([HALF_WIDTH, TILE_HEIGHT])
-
-      step = 1
-      entryPoint = tile2.closestEntryPoint(nextCoordinates)
-      expect(entryPoint).toEqual('negY')
-
-      nextCoordinates = tile2.travelFunction(step, entryPoint)
-      expect(nextCoordinates).toEqual([HALF_WIDTH, TILE_HEIGHT+1])
-    })
-
-    // test('backward, no rotation', () => {
-    //   const tile1 = new Tile({ type: 'STRAIGHT', position: [0,0] })
-    //   const tile2 = new Tile({ type: 'STRAIGHT', position: [0,1] })
-    //
-    //   let step = 1
-    //   let entryPoint = tile2.closestEntryPoint([ HALF_WIDTH, TILE_HEIGHT ])
-    //   expect(entryPoint).toEqual('negY')
-    //
-    //   let nextCoordinates = tile2.travelFunction(step, entryPoint)
-    //   expect(nextCoordinates).toEqual([HALF_WIDTH, TILE_HEIGHT+1])
-    //
-    //   step--
-    //   nextCoordinates = tile2.travelFunction(step, entryPoint)
-    //   expect(nextCoordinates).toEqual([HALF_WIDTH, TILE_HEIGHT])
-    //
-    //   step = TILE_HEIGHT
-    //   entryPoint = tile1.closestEntryPoint(nextCoordinates)
-    //   expect(entryPoint).toEqual('negY')
-    //   //
-    //   // nextCoordinates = tile2.travelFunction(step, entryPoint)
-    //   // expect(nextCoordinates).toEqual([HALF_WIDTH, TILE_HEIGHT+1])
-    // })
-
   })
 })
