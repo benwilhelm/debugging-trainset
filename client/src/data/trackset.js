@@ -22,7 +22,7 @@ export const branching = [
 
 export const straight = [
   { id: "1", type: "STRAIGHT", rotation:   0, position: [ 2, 1 ]},
-  { id: "2", type: "STRAIGHT", rotation: 180, position: [ 2, 2 ]},
+  { id: "2", type: "STRAIGHT", rotation:   0, position: [ 2, 2 ]},
 ]
 
 export const single = [
