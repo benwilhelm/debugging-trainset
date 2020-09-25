@@ -1,6 +1,7 @@
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants'
-import Tile from '../models/tile'
-import Engine from '../models/engine'
+import Tile from '../models/Tile'
+import Engine from '../models/Engine'
+import { tilePositionFromCoordinates } from '../util'
 import { saveTileData, loadTileData } from '../services/persistence'
 
 export const UPDATE_ENGINE = "UPDATE_ENGINE"
@@ -122,40 +123,53 @@ const actionHandlers = {
   },
   [ENGINE_TRAVEL]: (state, {payload}) => {
     const {engine, deltaTime} = payload
-    const tile = selectTileByCoordinates(state, engine.coordinates)
-    const step = engine.step + (deltaTime/1000 * engine.speed)
-    const referencePoint = engine.entryPoint || tile.closestEntryPoint(engine.coordinates)
-    const nextEnginePosition = tile.travelFunction(step, referencePoint)
-    const nextCoordinates = nextEnginePosition.point
-    const nextRotation = nextEnginePosition.rotation
-    if (step > tile.totalSteps || step < 0) {
-      const nextTile = selectTileByCoordinates(state, nextCoordinates)
-      if (!nextTile) {
-        return reducer(state, stopEngine(engine.id))
-      }
-
-      const nextReferencePoint = nextTile.getReferencePoint(nextCoordinates, engine.speed)
-      if (!nextReferencePoint) {
-        return reducer(state, stopEngine(engine.id))
-      }
-
-      return reducer(state, updateEngine(engine.id, {
-        id: engine.id,
-        coordinates: nextCoordinates,
-        rotation: nextRotation,
-        entryPoint: nextReferencePoint,
-        step: (step > 0) ? step - tile.totalSteps
-                         : nextTile.totalSteps - step
-      }))
-    }
-
-    return actionHandlers[UPDATE_ENGINE](state, { payload: {
+    const steps = deltaTime/1000 * engine.speed
+    const { speed, location, entryPoint, step } = getNextLocation(engine, state.tiles, steps)
+    return reducer(state, updateEngine({
       id: engine.id,
-      coordinates: nextCoordinates,
-      rotation: nextRotation,
-      entryPoint: referencePoint,
+      coordinates: location.point,
+      rotation: location.rotation,
+      speed,
+      entryPoint,
       step
-    }})
+    }))
+
+
+
+    // const tile = selectTileByCoordinates(state, engine.coordinates)
+    // const step = engine.step + (deltaTime/1000 * engine.speed)
+    // const referencePoint = engine.entryPoint || tile.closestEntryPoint(engine.coordinates)
+    // const nextEnginePosition = tile.travelFunction(step, referencePoint)
+    // const nextCoordinates = nextEnginePosition.point
+    // const nextRotation = nextEnginePosition.rotation
+    // if (step > tile.totalSteps || step < 0) {
+    //   const nextTile = selectTileByCoordinates(state, nextCoordinates)
+    //   if (!nextTile) {
+    //     return reducer(state, stopEngine(engine.id))
+    //   }
+    //
+    //   const nextReferencePoint = nextTile.getReferencePoint(nextCoordinates, engine.speed)
+    //   if (!nextReferencePoint) {
+    //     return reducer(state, stopEngine(engine.id))
+    //   }
+    //
+    //   return reducer(state, updateEngine(engine.id, {
+    //     id: engine.id,
+    //     coordinates: nextCoordinates,
+    //     rotation: nextRotation,
+    //     entryPoint: nextReferencePoint,
+    //     step: (step > 0) ? step - tile.totalSteps
+    //                      : nextTile.totalSteps - step
+    //   }))
+    // }
+    //
+    // return actionHandlers[UPDATE_ENGINE](state, { payload: {
+    //   id: engine.id,
+    //   coordinates: nextCoordinates,
+    //   rotation: nextRotation,
+    //   entryPoint: referencePoint,
+    //   step
+    // }})
   },
 
   [UPDATE_TILE]: (state, { payload }) => {
@@ -196,6 +210,75 @@ export default function reducer(state=initialState, action) {
   return actionHandlers.hasOwnProperty(action.type)
        ? actionHandlers[action.type](state, action)
        : state
+}
+
+export function getNextLocation(car, tiles, steps) {
+  const currentTileIndex = tilePositionFromCoordinates(car.coordinates).toString()
+  console.log(currentTileIndex, steps)
+  const currentTile = tiles[currentTileIndex]
+
+  // in same tile
+  if (
+    (steps === 0)
+    || (steps > 0 && steps < currentTile.totalSteps)
+    || (steps < 0 && Math.abs(steps) <= car.step)
+  ) {
+    return {
+      location: currentTile.travelFunction(car.step + steps, car.entryPoint),
+      speed: car.speed,
+      entryPoint: car.entryPoint,
+      step: car.step + steps
+    }
+  }
+
+  // forward, beyond current tile
+  if (steps > 0 && steps + car.step > currentTile.totalSteps) {
+    const stepsInTile = currentTile.totalSteps - car.step
+    const stepsBeyondTile = steps - stepsInTile
+    const nextTileLocation = currentTile.travelFunction(currentTile.totalSteps, car.entryPoint)
+    const nextTileIndex = tilePositionFromCoordinates(nextTileLocation.point).toString()
+    const nextTile = tiles[nextTileIndex]
+    const nextEntryPoint = nextTile.getReferencePoint(nextTileLocation.point, car.speed)
+    if (!nextEntryPoint)
+      return {
+        location: currentTile.travelFunction(currentTile.totalSteps, car.entryPoint),
+        speed: 0,
+        entryPoint: car.entryPoint
+      }
+
+    return getNextLocation({
+      ...car,
+      step: 0,
+      entryPoint: nextEntryPoint,
+      coordinates: nextTileLocation.point,
+      rotation: nextTileLocation.rotation
+    }, tiles, stepsBeyondTile)
+  }
+
+  // backward, beyond current tile
+  if (car.step + steps < 0) {
+    const stepsBeyondTile = car.step + steps
+
+    const throwAway = currentTile.travelFunction(-1, car.entryPoint)
+    const nextTileIndex = tilePositionFromCoordinates(throwAway.point).toString()
+    const nextTile = tiles[nextTileIndex]
+    const nextEntryPoint = nextTile.getReferencePoint(throwAway.point, car.speed)
+    const nextTileLocation = nextTile.travelFunction(nextTile.totalSteps, nextEntryPoint)
+    if (!nextEntryPoint)
+      return {
+        location: currentTile.travelFunction(0, car.entryPoint),
+        speed: 0,
+        entryPoint: car.entryPoint
+      }
+
+    return getNextLocation({
+      ...car,
+      step: nextTile.totalSteps,
+      entryPoint: nextEntryPoint,
+      coordinates: nextTileLocation.point,
+      rotation: nextTileLocation.rotation
+    }, tiles, stepsBeyondTile)
+  }
 }
 
 
