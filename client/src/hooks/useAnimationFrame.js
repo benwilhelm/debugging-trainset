@@ -10,7 +10,10 @@ export default (callback) => {
   const animate = (time) => {
     if (previousTimeRef.current !== undefined) {
       const deltaTime = time - previousTimeRef.current
-      callback(deltaTime)
+
+      const adjustedDeltaTime = deltaTime > 200 ? 16 : deltaTime
+
+      callback(adjustedDeltaTime)
     }
 
     previousTimeRef.current = time

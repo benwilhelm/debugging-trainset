@@ -39,12 +39,14 @@ export const stopEngine = (engineId) => ({
 })
 
 export const addEngineToTile = (tile) => {
+  const { point, rotation } = tile.travelFunction(10, tile.from)
   return {
     type: INSERT_ENGINE,
     payload: {
-      coordinates: tile.travelFunction(10, tile.from),
       step: 10,
-      // entryPoint: tile.from
+      coordinates: point,
+      rotation,
+      entryPoint: tile.from
     }
   }
 }
@@ -123,7 +125,9 @@ const actionHandlers = {
     const tile = selectTileByCoordinates(state, engine.coordinates)
     const step = engine.step + (deltaTime/1000 * engine.speed)
     const referencePoint = engine.entryPoint || tile.closestEntryPoint(engine.coordinates)
-    const nextCoordinates = tile.travelFunction(step, referencePoint)
+    const nextEnginePosition = tile.travelFunction(step, referencePoint)
+    const nextCoordinates = nextEnginePosition.point
+    const nextRotation = nextEnginePosition.rotation
     if (step > tile.totalSteps || step < 0) {
       const nextTile = selectTileByCoordinates(state, nextCoordinates)
       if (!nextTile) {
@@ -138,6 +142,7 @@ const actionHandlers = {
       return reducer(state, updateEngine(engine.id, {
         id: engine.id,
         coordinates: nextCoordinates,
+        rotation: nextRotation,
         entryPoint: nextReferencePoint,
         step: (step > 0) ? step - tile.totalSteps
                          : nextTile.totalSteps - step
@@ -147,6 +152,7 @@ const actionHandlers = {
     return actionHandlers[UPDATE_ENGINE](state, { payload: {
       id: engine.id,
       coordinates: nextCoordinates,
+      rotation: nextRotation,
       entryPoint: referencePoint,
       step
     }})
