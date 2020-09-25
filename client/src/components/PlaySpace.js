@@ -3,7 +3,7 @@ import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
 import Engine from './Engine'
 import EngineSpeed from './EngineSpeed'
-import { TILE_WIDTH, TILE_HEIGHT } from '../constants'
+import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS } from '../constants'
 import useAnimationFrame from '../hooks/useAnimationFrame'
 import store, {
   toggleTileSegment,
@@ -86,7 +86,7 @@ const PlaySpace = ({
   return (
     <div>
       <svg ref={svgEl}
-           style={{border: '1px solid blue'}}
+           style={{backgroundColor: COLOR_GRASS}}
            viewBox={viewBox.join(' ')} xmlns="http://www.w3.org/2000/svg"
            onMouseMove={handleMouseMove}
            onWheel={handleMouseWheel}
