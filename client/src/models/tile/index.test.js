@@ -115,25 +115,30 @@ describe('Tile class', () => {
     test('applies the position and rotation to selected segment\'s travel function', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [1, 2], rotation: 90})
       const start = tile.travelFunction(0, 'negY')
-      expect(start).toEqual([200, 250])
+      expect(start.point).toEqual([200, 250])
+      expect(start.rotation).toEqual(90)
 
       const end = tile.travelFunction(TILE_HEIGHT, 'negY')
-      expect(end).toEqual([100, 250])
+      expect(end.point).toEqual([100, 250])
+      expect(end.rotation).toEqual(90)
     })
 
-    test('reflects step over midpoint when traveling upstream', () => {
+    test('reflects step over midpoint and rotates engine when traveling upstream', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0, 0], rotation: 90})
       const start = tile.travelFunction(0, 'posY')
-      expect(start).toEqual([0, 50])
+      expect(start.point).toEqual([0, 50])
+      expect(start.rotation).toEqual(270)
 
       const end = tile.travelFunction(TILE_HEIGHT, 'posY')
-      expect(end).toEqual([100, 50])
+      expect(end.point).toEqual([100, 50])
+      expect(end.rotation).toEqual(270)
     })
 
     test('accounts for rotated segments', () => {
       const tile = new Tile({ type: 'YLEFT', position: [1, 2], rotation: 90, selectedSegment: 1})
-      const nextPosition = tile.travelFunction(0, 'negY')
-      expect(nextPosition).toEqual([150, 300])
+      const next = tile.travelFunction(0, 'negY')
+      expect(next.point).toEqual([150, 300])
+      expect(next.rotation).toEqual(180)
     })
   })
 })

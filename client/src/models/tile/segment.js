@@ -1,5 +1,5 @@
 import { TILE_HEIGHT, TILE_WIDTH} from '../../constants'
-import { cartesianFromPolar } from '../../util'
+import { cartesianFromPolar, degreesFromRadians } from '../../util'
 
 const segmentFactory = (segment) => {
   switch (segment.type) {
@@ -30,7 +30,10 @@ export class SegmentStraight extends Segment {
   to = 'posY'
 
   travelFunction(step) {
-    return [ TILE_WIDTH/2, step ]
+    return {
+      point: [ TILE_WIDTH/2, step ],
+      rotation: 0
+    }
   }
 }
 
@@ -45,6 +48,9 @@ export class SegmentCurve extends Segment {
     const radPerStep = (Math.PI / 2) / this.totalSteps
     const theta = step * radPerStep
     const r = TILE_WIDTH / 2
-    return cartesianFromPolar([r, theta])
+    return {
+      point: cartesianFromPolar([r, theta]),
+      rotation: degreesFromRadians(theta)
+    }
   }
 }

@@ -31,7 +31,7 @@ export default ({rotation=0}) => (
     />
 
     { range( TRUE_TIE_SPACING/2, TILE_HEIGHT, TRUE_TIE_SPACING ).map(
-      y => <Tie x={TILE_WIDTH/2} y={y} />
+      y => <Tie key={y} x={TILE_WIDTH/2} y={y} />
     )}
 
     <line

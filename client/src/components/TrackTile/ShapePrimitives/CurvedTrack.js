@@ -39,7 +39,7 @@ export default ({ rotation=0 }) => (
       const r = HALF_WIDTH
       const theta = l / r
       const [ x, y ] = cartesianFromPolar([r, theta])
-      return <Tie x={x} y={y} rotation={degreesFromRadians(theta)} />
+      return <Tie key={l} x={x} y={y} rotation={degreesFromRadians(theta)} />
     })}
 
 
