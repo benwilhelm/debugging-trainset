@@ -1,5 +1,5 @@
 import React from 'react'
-import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS_HOVER} from '../constants'
+import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS_HOVER} from '../../constants'
 import { Straight, Curve, YLeft, YRight } from './TrackTile'
 import './HoverIndicator.css'
 

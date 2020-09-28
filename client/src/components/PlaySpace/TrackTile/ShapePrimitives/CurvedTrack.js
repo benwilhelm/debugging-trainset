@@ -1,6 +1,6 @@
 import React from 'react'
 import Tie from './Tie'
-import { cartesianFromPolar, degreesFromRadians } from '../../../util'
+import { cartesianFromPolar, degreesFromRadians } from '../../../../util'
 import { range } from 'lodash'
 import {
   TILE_WIDTH,
@@ -13,7 +13,7 @@ import {
   COLOR_RAIL,
   RAIL_WIDTH,
   TIE_SPACING,
-} from '../../../constants'
+} from '../../../../constants'
 
 const RAIL_INNER_R = TILE_WIDTH/2 - TRACK_WIDTH/2
 const RAIL_OUTER_R = TILE_WIDTH/2 + TRACK_WIDTH/2

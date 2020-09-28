@@ -10,7 +10,7 @@ import {
   RAIL_WIDTH,
   TIE_SPACING,
   COLOR_RAIL,
-} from '../../../constants'
+} from '../../../../constants'
 
 const RAIL_LEFT_X = TILE_WIDTH/2 - TRACK_WIDTH/2
 const RAIL_RIGHT_X = TILE_WIDTH/2 + TRACK_WIDTH/2

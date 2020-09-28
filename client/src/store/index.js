@@ -24,7 +24,7 @@ export default createStore(
 export {
   updateTile, deleteTile, toggleTileSegment, insertTile, rotateTile,
   fetchTiles, persistTileAction, addEngineToTile,
-  updateEngine, engineTravel
+  updateEngine, engineTravel, deleteEngine
 } from './playspace'
 
 export const selectEngineById = (state, id) => selectEngineFromSlice(state.playspace, id)

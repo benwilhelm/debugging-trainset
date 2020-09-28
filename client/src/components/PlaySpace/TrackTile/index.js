@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import TileBg from './ShapePrimitives/TileBg'
 import Straight from './ShapePrimitives/StraightTrack'
 import Curve from './ShapePrimitives/CurvedTrack'
-import { TILE_WIDTH, TILE_HEIGHT } from '../../constants'
+import { TILE_WIDTH, TILE_HEIGHT } from '../../../constants'
 import "./index.css"
-import { ReactComponent as RotateIcon } from '../../img/noun_Rotate_120470.svg'
-import { ReactComponent as EngineIcon } from '../../img/noun_Train_81514.svg'
-import { ReactComponent as TrashIcon } from '../../img/noun_Trash_2025448.svg'
+import { ReactComponent as RotateIcon } from '../../../img/noun_Rotate_120470.svg'
+import { ReactComponent as EngineIcon } from '../../../img/noun_Train_81514.svg'
+import { ReactComponent as TrashIcon } from '../../../img/noun_Trash_2025448.svg'
 
 const noop = () => {}
 

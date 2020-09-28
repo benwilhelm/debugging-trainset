@@ -1,5 +1,5 @@
 import React from 'react'
-import { TILE_WIDTH, TILE_HEIGHT } from '../../constants'
+import { TILE_WIDTH, TILE_HEIGHT } from '../../../constants'
 import { TileBg, CurvedTrack } from './ShapePrimitives'
 
 export default ({rotation}) => (

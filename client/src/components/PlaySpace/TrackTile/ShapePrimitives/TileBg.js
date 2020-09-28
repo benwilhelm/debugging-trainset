@@ -1,5 +1,5 @@
 import React from 'react'
-import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS, COLOR_GRASS_HOVER } from '../../../constants'
+import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS, COLOR_GRASS_HOVER } from '../../../../constants'
 
 export default ({ hovering }) => {
   const fill = hovering ? COLOR_GRASS_HOVER : COLOR_GRASS;

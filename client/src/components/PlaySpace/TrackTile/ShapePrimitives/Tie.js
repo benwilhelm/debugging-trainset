@@ -1,5 +1,5 @@
 import React from 'react'
-import { COLOR_TIE, TRACK_BED_WIDTH } from '../../../constants'
+import { COLOR_TIE, TRACK_BED_WIDTH } from '../../../../constants'
 
 const TIE_LENGTH = TRACK_BED_WIDTH - 14
 const TIE_WIDTH = 6

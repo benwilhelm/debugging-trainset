@@ -1,0 +1,21 @@
+.sidebar {
+  padding: 2rem 1rem 0;
+}
+
+.engine-control {
+  display: flex;
+  margin-bottom: 3rem;
+}
+
+.engine-control .color-indicator {
+  flex-basis: 2rem;
+  flex-grow: 0;
+  height: 3rem;
+  padding: 15px 10px 0;
+  cursor: pointer;
+}
+
+.engine-speed {
+  padding: 0 .5rem;
+  flex-grow: 999;
+}

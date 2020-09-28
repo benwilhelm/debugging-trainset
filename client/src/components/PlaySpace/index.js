@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
 import Engine from './Engine'
-import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS } from '../constants'
-import useAnimationFrame from '../hooks/useAnimationFrame'
+import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS } from '../../constants'
+import useAnimationFrame from '../../hooks/useAnimationFrame'
 import store, {
   toggleTileSegment,
   insertTile,
@@ -15,7 +15,7 @@ import store, {
   engineTravel,
   selectAllEngines,
   selectAllTiles,
-} from '../store'
+} from '../../store'
 import { connect } from 'react-redux'
 
 
@@ -88,9 +88,6 @@ const PlaySpace = ({
     })
   })
 
-
-
-
   useEffect(() => {
     const updateViewBoxAspect = () => {
       const aspect = containerEl.current
@@ -104,6 +101,10 @@ const PlaySpace = ({
 
     return () => window.removeEventListener('resize', updateViewBoxAspect)
   }, [])
+
+  const zoomFactor = containerEl.current
+                   ? containerEl.current.clientWidth / viewBox[2]
+                   : 1
 
   return (
     <div className="playspace" ref={containerEl}>
@@ -127,8 +128,9 @@ const PlaySpace = ({
         {engines.map(engine => {
           const tile = tilesByPosition[engine.tilePosition.toString()]
           const { point, rotation } = tile.travelFunction(engine.step, engine.entryPoint)
-          return <Engine key={`engine-${engine.id}`} engine={engine} coordinates={point} rotation={rotation} />
+          return <Engine key={`engine-${engine.id}`} engine={engine} coordinates={point} rotation={rotation} zoomFactor={zoomFactor} />
         })}
+
       </svg>
     </div>
 

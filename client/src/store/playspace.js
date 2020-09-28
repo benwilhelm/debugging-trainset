@@ -6,6 +6,7 @@ import { saveTileData, loadTileData } from '../services/persistence'
 export const UPDATE_ENGINE = "UPDATE_ENGINE"
 export const ENGINE_TRAVEL = "ENGINE_TRAVEL"
 export const INSERT_ENGINE = "INSERT_ENGINE"
+export const DELETE_ENGINE = "DELETE_ENGINE"
 
 export const UPDATE_TILE = "UPDATE_TILE"
 export const INSERT_TILE = "INSERT_TILE"
@@ -23,9 +24,9 @@ const initialState = {
 // ACTION CREATORS
 // ====================
 
-export const updateEngine = (id, props) => ({
+export const updateEngine = (engine) => ({
   type: UPDATE_ENGINE,
-  payload: { ...props, id }
+  payload: engine
 })
 
 export const engineTravel = (engine, steps) => ({
@@ -36,6 +37,11 @@ export const engineTravel = (engine, steps) => ({
 export const stopEngine = (engineId) => ({
   type: UPDATE_ENGINE,
   payload: { id: engineId, speed: 0 }
+})
+
+export const deleteEngine = (engineId) => ({
+  type: DELETE_ENGINE,
+  payload: engineId
 })
 
 export const addEngineToTile = (tile) => {
@@ -138,40 +144,14 @@ const actionHandlers = {
         speed
       })
     }}
-    // const tile = selectTileByCoordinates(state, engine.coordinates)
-    // const step = engine.step + (deltaTime/1000 * engine.speed)
-    // const referencePoint = engine.entryPoint || tile.closestEntryPoint(engine.coordinates)
-    // const nextEnginePosition = tile.travelFunction(step, referencePoint)
-    // const nextCoordinates = nextEnginePosition.point
-    // const nextRotation = nextEnginePosition.rotation
-    // if (step > tile.totalSteps || step < 0) {
-    //   const nextTile = selectTileByCoordinates(state, nextCoordinates)
-    //   if (!nextTile) {
-    //     return reducer(state, stopEngine(engine.id))
-    //   }
-    //
-    //   const nextReferencePoint = nextTile.getReferencePoint(nextCoordinates, engine.speed)
-    //   if (!nextReferencePoint) {
-    //     return reducer(state, stopEngine(engine.id))
-    //   }
-    //
-    //   return reducer(state, updateEngine(engine.id, {
-    //     id: engine.id,
-    //     coordinates: nextCoordinates,
-    //     rotation: nextRotation,
-    //     entryPoint: nextReferencePoint,
-    //     step: (step > 0) ? step - tile.totalSteps
-    //                      : nextTile.totalSteps - step
-    //   }))
-    // }
-    //
-    // return actionHandlers[UPDATE_ENGINE](state, { payload: {
-    //   id: engine.id,
-    //   coordinates: nextCoordinates,
-    //   rotation: nextRotation,
-    //   entryPoint: referencePoint,
-    //   step
-    // }})
+
+  },
+
+  [DELETE_ENGINE]: (state, { payload }) => {
+    const engineId = payload
+    const engines = {...state.engines}
+    delete engines[engineId]
+    return {...state, engines}
   },
 
   [UPDATE_TILE]: (state, { payload }) => {
