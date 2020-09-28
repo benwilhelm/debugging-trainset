@@ -32,6 +32,7 @@ function pageCoordsToSvgCoords(pageCoords, svg) {
 
 const PlaySpace = ({
   tiles,
+  tilesByPosition,
   engines,
   dispatchToggleSegment,
   dispatchInsertTile,
@@ -79,7 +80,8 @@ const PlaySpace = ({
   useAnimationFrame((deltaTime) => {
     const state = store.getState()
     selectAllEngines(state).forEach(engine => {
-      dispatchEngineTravel(engine, deltaTime)
+      const steps = deltaTime/1000 * engine.speed
+      dispatchEngineTravel(engine, steps)
     })
   })
 
@@ -102,7 +104,11 @@ const PlaySpace = ({
           />
         ))}
 
-        {engines.map(engine => <Engine key={`engine-${engine.id}`} engine={engine} />)}
+        {engines.map(engine => {
+          const tile = tilesByPosition[engine.tilePosition.toString()]
+          const { point, rotation } = tile.travelFunction(engine.step, engine.entryPoint)
+          return <Engine key={`engine-${engine.id}`} engine={engine} coordinates={point} rotation={rotation} />
+        })}
       </svg>
 
       {engines.map(engine => <EngineSpeed key={`throttle-${engine.id}`} onUpdate={(speed) => dispatchUpdateEngine(engine.id, { speed })} value={engine.speed} />)}
@@ -113,6 +119,7 @@ const PlaySpace = ({
 
 const mapState = (state) => ({
   tiles: selectAllTiles(state),
+  tilesByPosition: state.playspace.tiles,
   engines: selectAllEngines(state)
 })
 

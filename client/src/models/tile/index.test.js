@@ -35,6 +35,36 @@ describe('Tile class', () => {
     expect(curve.rotation).toEqual(0)
   })
 
+  describe('nextTilePosition()', () => {
+    test('should give position of next tile', () => {
+      const tile = new Tile({ type: 'STRAIGHT', position: [0, 0]})
+      expect(tile.nextTilePosition('negY')).toEqual([0, 1])
+      expect(tile.nextTilePosition('posY')).toEqual([0, -1])
+    })
+
+    test('should account for rotation, etc', () => {
+      const tile = new Tile({ type: 'YLEFT', rotation: 180, selectedSegment: 1, position: [2,2]})
+      expect(tile.nextTilePosition('negY')).toEqual([ 2, 3 ])
+      expect(tile.nextTilePosition('negX')).toEqual([ 1, 2 ])
+    })
+  })
+
+
+  describe('previousTilePosition()', () => {
+    test('should give position of next tile', () => {
+      const tile = new Tile({ type: 'STRAIGHT', position: [0, 0]})
+      expect(tile.previousTilePosition('posY')).toEqual([0, 1])
+      expect(tile.previousTilePosition('negY')).toEqual([0, -1])
+    })
+
+    test('should account for rotation, etc', () => {
+      const tile = new Tile({ type: 'YLEFT', rotation: 180, selectedSegment: 1, position: [2,2]})
+      expect(tile.previousTilePosition('negX')).toEqual([ 2, 3 ])
+      expect(tile.previousTilePosition('negY')).toEqual([ 1, 2 ])
+    })
+  })
+
+  
   describe('closestEntryPoint()', () => {
     test('basic case with no rotation', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0, 0]})

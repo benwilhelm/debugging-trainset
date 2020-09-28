@@ -28,9 +28,9 @@ export const updateEngine = (id, props) => ({
   payload: { ...props, id }
 })
 
-export const engineTravel = (engine, deltaTime) => ({
+export const engineTravel = (engine, steps) => ({
   type: ENGINE_TRAVEL,
-  payload: { engine, deltaTime }
+  payload: { engine, steps }
 })
 
 export const stopEngine = (engineId) => ({
@@ -43,10 +43,9 @@ export const addEngineToTile = (tile) => {
   return {
     type: INSERT_ENGINE,
     payload: {
+      tilePosition: tile.position,
+      entryPoint: tile.from,
       step: 10,
-      coordinates: point,
-      rotation,
-      entryPoint: tile.from
     }
   }
 }
@@ -121,41 +120,59 @@ const actionHandlers = {
     } }
   },
   [ENGINE_TRAVEL]: (state, {payload}) => {
-    const {engine, deltaTime} = payload
-    const tile = selectTileByCoordinates(state, engine.coordinates)
-    const step = engine.step + (deltaTime/1000 * engine.speed)
-    const referencePoint = engine.entryPoint || tile.closestEntryPoint(engine.coordinates)
-    const nextEnginePosition = tile.travelFunction(step, referencePoint)
-    const nextCoordinates = nextEnginePosition.point
-    const nextRotation = nextEnginePosition.rotation
-    if (step > tile.totalSteps || step < 0) {
-      const nextTile = selectTileByCoordinates(state, nextCoordinates)
-      if (!nextTile) {
-        return reducer(state, stopEngine(engine.id))
-      }
+    const {engine, steps} = payload
+    const {
+      tilePosition,
+      step,
+      entryPoint,
+      speed,
+    } = getDestinationTile(engine, steps, state.tiles)
 
-      const nextReferencePoint = nextTile.getReferencePoint(nextCoordinates, engine.speed)
-      if (!nextReferencePoint) {
-        return reducer(state, stopEngine(engine.id))
-      }
 
-      return reducer(state, updateEngine(engine.id, {
-        id: engine.id,
-        coordinates: nextCoordinates,
-        rotation: nextRotation,
-        entryPoint: nextReferencePoint,
-        step: (step > 0) ? step - tile.totalSteps
-                         : nextTile.totalSteps - step
-      }))
-    }
-
-    return actionHandlers[UPDATE_ENGINE](state, { payload: {
-      id: engine.id,
-      coordinates: nextCoordinates,
-      rotation: nextRotation,
-      entryPoint: referencePoint,
-      step
-    }})
+    return {...state, engines: {
+      ...state.engines,
+      [engine.id]: new Engine({
+        ...engine,
+        step,
+        tilePosition,
+        entryPoint,
+        speed
+      })
+    }}
+    // const tile = selectTileByCoordinates(state, engine.coordinates)
+    // const step = engine.step + (deltaTime/1000 * engine.speed)
+    // const referencePoint = engine.entryPoint || tile.closestEntryPoint(engine.coordinates)
+    // const nextEnginePosition = tile.travelFunction(step, referencePoint)
+    // const nextCoordinates = nextEnginePosition.point
+    // const nextRotation = nextEnginePosition.rotation
+    // if (step > tile.totalSteps || step < 0) {
+    //   const nextTile = selectTileByCoordinates(state, nextCoordinates)
+    //   if (!nextTile) {
+    //     return reducer(state, stopEngine(engine.id))
+    //   }
+    //
+    //   const nextReferencePoint = nextTile.getReferencePoint(nextCoordinates, engine.speed)
+    //   if (!nextReferencePoint) {
+    //     return reducer(state, stopEngine(engine.id))
+    //   }
+    //
+    //   return reducer(state, updateEngine(engine.id, {
+    //     id: engine.id,
+    //     coordinates: nextCoordinates,
+    //     rotation: nextRotation,
+    //     entryPoint: nextReferencePoint,
+    //     step: (step > 0) ? step - tile.totalSteps
+    //                      : nextTile.totalSteps - step
+    //   }))
+    // }
+    //
+    // return actionHandlers[UPDATE_ENGINE](state, { payload: {
+    //   id: engine.id,
+    //   coordinates: nextCoordinates,
+    //   rotation: nextRotation,
+    //   entryPoint: referencePoint,
+    //   step
+    // }})
   },
 
   [UPDATE_TILE]: (state, { payload }) => {
@@ -224,4 +241,54 @@ export const selectTileByCoordinates = (state, [x, y]) => {
 
 export const selectAllTiles = (state) => {
   return Object.values(state.tiles)
+}
+
+
+export function getDestinationTile(engine, steps, tiles) {
+  const { step, entryPoint, tilePosition, speed } = engine
+  const tile = tiles[tilePosition.toString()]
+  const destStep = step + steps
+
+  if (destStep >=0 && destStep < tile.totalSteps) {
+    return { step: destStep, entryPoint, tilePosition, speed}
+  }
+
+
+  const forward = (destStep >= 0)
+  const nextTilePosition = (forward)
+                         ? tile.nextTilePosition(entryPoint)
+                         : tile.previousTilePosition(entryPoint)
+  const nextTile = tiles[nextTilePosition.toString()]
+  if (!nextTile) {
+    return {
+      step: (forward) ? tile.totalSteps : 0,
+      speed: 0,
+      entryPoint,
+      tilePosition,
+    }
+  }
+
+  const borderStep = (forward) ? tile.totalSteps + 1 : -1
+  const { point: borderCoords } = tile.travelFunction(borderStep, entryPoint)
+  const nextEntryPoint = nextTile.getReferencePoint(borderCoords, speed)
+  if (!nextEntryPoint) {
+    return {
+      step: (forward) ? tile.totalSteps : 0,
+      speed: 0,
+      entryPoint,
+      tilePosition,
+    }
+  }
+
+
+  const engineParams = {
+    step: 0,
+    entryPoint: nextEntryPoint,
+    tilePosition: nextTilePosition,
+    speed
+  }
+  const newDestStep = (forward)
+                    ? destStep - tile.totalSteps
+                    : nextTile.totalSteps + destStep // destStep is negative here
+  return getDestinationTile(engineParams, newDestStep, tiles)
 }

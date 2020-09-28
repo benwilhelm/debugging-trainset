@@ -1,7 +1,7 @@
 import { TILE_WIDTH, TILE_HEIGHT } from '../../constants'
 import { v4 as uuid } from 'uuid'
 import segmentFactory from './segment'
-import { reflectOver } from '../../util'
+import { reflectOver, tilePositionFromCoordinates } from '../../util'
 
 export default class Tile {
   constructor({ id, type, position, rotation=0, selectedSegment=0}) {
@@ -77,6 +77,16 @@ export default class Tile {
         rotated[1] + this.position[1] * TILE_HEIGHT
       ]
     }
+  }
+
+  nextTilePosition(entryPoint) {
+    const location = this.travelFunction(this.totalSteps+1, entryPoint)
+    return tilePositionFromCoordinates(location.point)
+  }
+
+  previousTilePosition(entryPoint) {
+    const location = this.travelFunction(-1, entryPoint)
+    return tilePositionFromCoordinates(location.point)
   }
 
   validEntryPoint(entryPoint) {

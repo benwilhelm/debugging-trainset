@@ -5,11 +5,11 @@ import { TRACK_WIDTH } from '../constants'
 const ENGINE_LENGTH = TRACK_WIDTH * 3
 const ENGINE_WIDTH = TRACK_WIDTH + 10
 
-export default ({ engine }) => {
-  const [ x, y ] = engine.coordinates
+export default ({ engine, coordinates, rotation }) => {
+  const [ x, y ] = coordinates
 
   return <svg className='engine' x={x} y={y}>
-    <g transform={`rotate(${engine.rotation} 0 0)`}>
+    <g transform={`rotate(${rotation} 0 0)`}>
 
       <circle cx={0} cy={ENGINE_LENGTH/2} r={3} fill={"#FF8"} />
 
