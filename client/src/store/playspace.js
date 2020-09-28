@@ -39,7 +39,6 @@ export const stopEngine = (engineId) => ({
 })
 
 export const addEngineToTile = (tile) => {
-  const { point, rotation } = tile.travelFunction(10, tile.from)
   return {
     type: INSERT_ENGINE,
     payload: {

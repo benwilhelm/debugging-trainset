@@ -4,6 +4,9 @@ import Straight from './ShapePrimitives/StraightTrack'
 import Curve from './ShapePrimitives/CurvedTrack'
 import { TILE_WIDTH, TILE_HEIGHT } from '../../constants'
 import "./index.css"
+import { ReactComponent as RotateIcon } from '../../img/noun_Rotate_120470.svg'
+import { ReactComponent as EngineIcon } from '../../img/noun_Train_81514.svg'
+import { ReactComponent as TrashIcon } from '../../img/noun_Trash_2025448.svg'
 
 const noop = () => {}
 
@@ -40,6 +43,7 @@ export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, ro
             dominantBaseline='middle'
             textAnchor='middle'
             transform='rotate(90 50 10)'
+            fill="white"
             onClick={() => toggleSegment(tile)}
           >{'\u292e'}</text>
         }
@@ -49,35 +53,32 @@ export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, ro
 
       {hovering && (
         <>
-          <text className="tile-control"
-            x={TILE_WIDTH/2}
-            y={TILE_HEIGHT/2}
+          <RotateIcon className="tile-control"
+            x={TILE_WIDTH/2 - 10}
+            y={TILE_HEIGHT/2 - 10}
             width={20}
             height={20}
-            dominantBaseline='middle'
-            textAnchor='middle'
+            fill="white"
             onClick={() => rotateTile(tile)}
-          >{'\u27f3'}</text>
+          />
 
-          <text className="tile-control"
-            x={TILE_WIDTH - 20}
-            y={TILE_HEIGHT - 20}
+          <TrashIcon className="tile-control"
+            x={TILE_WIDTH - 30}
+            y={TILE_HEIGHT - 30}
             width={20}
             height={20}
-            dominantBaseline='middle'
-            textAnchor='middle'
+            fill="white"
             onClick={() => deleteTile(tile)}
-          >{'\u274c'}</text>
+          />
 
-          <text className="tile-control"
-            x={20}
-            y={TILE_HEIGHT - 20}
+          <EngineIcon className="tile-control"
+            x={10}
+            y={TILE_HEIGHT - 30}
             width={20}
             height={20}
-            dominantBaseline='middle'
-            textAnchor='middle'
+            fill="white"
             onClick={() => insertEngine(tile)}
-          >+En</text>
+          />
 
         </>
       )}

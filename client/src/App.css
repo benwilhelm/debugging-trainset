@@ -1,0 +1,16 @@
+.App {
+  display: flex;
+  position: relative;
+  height: 100vh;
+}
+
+.playspace {
+  flex-basis: 0;
+  flex-grow: 9999;
+  height: 100%;
+}
+
+.sidebar {
+  flex-basis: 20rem;
+  flex-grow: 1
+}

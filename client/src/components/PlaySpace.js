@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react'
 import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
 import Engine from './Engine'
-import EngineSpeed from './EngineSpeed'
 import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS } from '../constants'
 import useAnimationFrame from '../hooks/useAnimationFrame'
 import store, {
@@ -13,7 +12,6 @@ import store, {
   fetchTiles,
   persistTileAction,
   addEngineToTile,
-  updateEngine,
   engineTravel,
   selectAllEngines,
   selectAllTiles,
@@ -43,9 +41,12 @@ const PlaySpace = ({
   dispatchUpdateEngine,
   dispatchEngineTravel
 }) => {
-  const [viewBox, setViewBox] = useState([0, 0, 800, 400])
-  const [ tileCoords, setTileCoords ] = useState([0, 0])
+
+  const containerEl = useRef(null)
   const svgEl = useRef(null)
+
+  const [viewBox, setViewBox] = useState([0, 0, 800, 400 ])
+  const [ tileCoords, setTileCoords ] = useState([0, 0])
 
   useEffect(() => {
     dispatchFetchTiles()
@@ -61,20 +62,22 @@ const PlaySpace = ({
 
   const handleMouseWheel = (e) => {
     const [ pointerX, pointerY ] = pageCoordsToSvgCoords([e.clientX, e.clientY], svgEl.current)
-    const [ x, y, w, h ] = viewBox
-    const weightX = (pointerX - x) / w
-    const weightY = (pointerY - y) / h
-
     const factor = (e.deltaY > 0)
                  ? 1 + (0.001 * e.deltaY)
                  : 1 - (0.001 * Math.abs(e.deltaY))
 
-    const newW = w * factor
-    const newH = h * factor
+    requestAnimationFrame(() => setViewBox(([x, y, w, h]) => {
+      const weightX = (pointerX - x) / w
+      const weightY = (pointerY - y) / h
 
-    const newX = x - ((newW - w) * weightX)
-    const newY = y - ((newH - h) * weightY)
-    requestAnimationFrame(() => setViewBox([ newX, newY, newW, newH ]))
+      const newW = w * factor
+      const newH = h * factor
+
+      const newX = x - ((newW - w) * weightX)
+      const newY = y - ((newH - h) * weightY)
+
+      return [ newX, newY, newW, newH ]
+    }))
   }
 
   useAnimationFrame((deltaTime) => {
@@ -85,8 +88,25 @@ const PlaySpace = ({
     })
   })
 
+
+
+
+  useEffect(() => {
+    const updateViewBoxAspect = () => {
+      const aspect = containerEl.current
+                   ? containerEl.current.clientWidth / containerEl.current.clientHeight
+                   : 2 / 1
+      setViewBox(([ x, y, w, h]) => ([x, y, w, w/aspect]), [])
+    }
+
+    updateViewBoxAspect()
+    window.addEventListener('resize', updateViewBoxAspect)
+
+    return () => window.removeEventListener('resize', updateViewBoxAspect)
+  }, [])
+
   return (
-    <div>
+    <div className="playspace" ref={containerEl}>
       <svg ref={svgEl}
            style={{backgroundColor: COLOR_GRASS}}
            viewBox={viewBox.join(' ')} xmlns="http://www.w3.org/2000/svg"
@@ -110,10 +130,8 @@ const PlaySpace = ({
           return <Engine key={`engine-${engine.id}`} engine={engine} coordinates={point} rotation={rotation} />
         })}
       </svg>
-
-      {engines.map(engine => <EngineSpeed key={`throttle-${engine.id}`} onUpdate={(speed) => dispatchUpdateEngine(engine.id, { speed })} value={engine.speed} />)}
-
     </div>
+
   )
 }
 
@@ -130,7 +148,6 @@ const mapDispatch = (dispatch) => ({
   dispatchAddEngineToTile: (tile) => dispatch(addEngineToTile(tile)),
   dispatchFetchTiles: (...args) => dispatch(fetchTiles(...args)),
   dispatchToggleSegment: (...args) => dispatch(toggleTileSegment(...args)),
-  dispatchUpdateEngine: (...args) => dispatch(updateEngine(...args)),
   dispatchEngineTravel: (...args) => dispatch(engineTravel(...args)),
 })
 
