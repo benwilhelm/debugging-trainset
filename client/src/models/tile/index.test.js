@@ -153,7 +153,7 @@ describe('Tile class', () => {
       expect(end.rotation).toEqual(90)
     })
 
-    test('reflects step over midpoint and rotates engine when traveling upstream', () => {
+    test('reflects step over midpoint and rotates train when traveling upstream', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0, 0], rotation: 90})
       const start = tile.travelFunction(0, 'posY')
       expect(start.point).toEqual([0, 50])

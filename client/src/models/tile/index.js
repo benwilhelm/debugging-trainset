@@ -63,7 +63,7 @@ export default class Tile {
     if (validEntry === -1)
       step = reflectOver(step, (segment.totalSteps / 2))
 
-    const {rotation: engineRotation, point: [x, y]} = segment.travelFunction(step)
+    const {rotation: carRotation, point: [x, y]} = segment.travelFunction(step)
     const totalRotation = (this.rotation + segment.rotation) % 360
     const [ax, ay] = [TILE_WIDTH/2, TILE_HEIGHT/2]
     const rotated = (totalRotation ===  90) ? [ -(y-ay) + ax,  (x-ax) + ay ]
@@ -71,7 +71,7 @@ export default class Tile {
                   : (totalRotation === 270) ? [  (y-ay) + ax, -(x-ax) + ay ]
                   : [x, y]
     return {
-      rotation: totalRotation + engineRotation + (validEntry === -1 ? 180 : 0),
+      rotation: totalRotation + carRotation + (validEntry === -1 ? 180 : 0),
       point: [
         rotated[0] + this.position[0] * TILE_WIDTH,
         rotated[1] + this.position[1] * TILE_HEIGHT

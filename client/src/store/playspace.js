@@ -1,12 +1,12 @@
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants'
 import Tile from '../models/Tile'
-import Engine from '../models/Engine'
+import Train from '../models/Train'
 import { saveTileData, loadTileData } from '../services/persistence'
 
-export const UPDATE_ENGINE = "UPDATE_ENGINE"
-export const ENGINE_TRAVEL = "ENGINE_TRAVEL"
-export const INSERT_ENGINE = "INSERT_ENGINE"
-export const DELETE_ENGINE = "DELETE_ENGINE"
+export const UPDATE_TRAIN = "UPDATE_TRAIN"
+export const TRAIN_TRAVEL = "TRAIN_TRAVEL"
+export const INSERT_TRAIN = "INSERT_TRAIN"
+export const DELETE_TRAIN = "DELETE_TRAIN"
 
 export const UPDATE_TILE = "UPDATE_TILE"
 export const INSERT_TILE = "INSERT_TILE"
@@ -17,36 +17,36 @@ export const TOGGLE_SEGMENT = "TOGGLE_SEGMENT"
 
 
 const initialState = {
-  engines: {},
+  trains: {},
   tiles: {}
 }
 
 // ACTION CREATORS
 // ====================
 
-export const updateEngine = (engine) => ({
-  type: UPDATE_ENGINE,
-  payload: engine
+export const updateTrain = (train) => ({
+  type: UPDATE_TRAIN,
+  payload: train
 })
 
-export const engineTravel = (engine, steps) => ({
-  type: ENGINE_TRAVEL,
-  payload: { engine, steps }
+export const trainTravel = (train, steps) => ({
+  type: TRAIN_TRAVEL,
+  payload: { train, steps }
 })
 
-export const stopEngine = (engineId) => ({
-  type: UPDATE_ENGINE,
-  payload: { id: engineId, speed: 0 }
+export const stopTrain = (trainId) => ({
+  type: UPDATE_TRAIN,
+  payload: { id: trainId, speed: 0 }
 })
 
-export const deleteEngine = (engineId) => ({
-  type: DELETE_ENGINE,
-  payload: engineId
+export const deleteTrain = (trainId) => ({
+  type: DELETE_TRAIN,
+  payload: trainId
 })
 
-export const addEngineToTile = (tile) => {
+export const addTrainToTile = (tile) => {
   return {
-    type: INSERT_ENGINE,
+    type: INSERT_TRAIN,
     payload: {
       tilePosition: tile.position,
       entryPoint: tile.from,
@@ -110,34 +110,34 @@ export const loadTiles = (tiles) => ({
 
 
 const actionHandlers = {
-  [INSERT_ENGINE]: (state, { payload }) => {
-    const engine = new Engine(payload)
-    const engines = { ...state.engines }
-    engines[engine.id] = engine
-    return { ...state, engines }
+  [INSERT_TRAIN]: (state, { payload }) => {
+    const train = new Train(payload)
+    const trains = { ...state.trains }
+    trains[train.id] = train
+    return { ...state, trains }
   },
-  [UPDATE_ENGINE]: (state, {payload}) => {
-    const existingEngine = selectEngineById(state, payload.id)
-    const updatedEngine = new Engine({ ...existingEngine, ...payload })
-    return { ...state, engines: {
-      ...state.engines,
-      [payload.id]: updatedEngine
+  [UPDATE_TRAIN]: (state, {payload}) => {
+    const existingTrain = selectTrainById(state, payload.id)
+    const updatedTrain = new Train({ ...existingTrain, ...payload })
+    return { ...state, trains: {
+      ...state.trains,
+      [payload.id]: updatedTrain
     } }
   },
-  [ENGINE_TRAVEL]: (state, {payload}) => {
-    const {engine, steps} = payload
+  [TRAIN_TRAVEL]: (state, {payload}) => {
+    const {train, steps} = payload
     const {
       tilePosition,
       step,
       entryPoint,
       speed,
-    } = getDestinationTile(engine, steps, state.tiles)
+    } = getDestinationTile(train, steps, state.tiles)
 
 
-    return {...state, engines: {
-      ...state.engines,
-      [engine.id]: new Engine({
-        ...engine,
+    return {...state, trains: {
+      ...state.trains,
+      [train.id]: new Train({
+        ...train,
         step,
         tilePosition,
         entryPoint,
@@ -147,11 +147,11 @@ const actionHandlers = {
 
   },
 
-  [DELETE_ENGINE]: (state, { payload }) => {
-    const engineId = payload
-    const engines = {...state.engines}
-    delete engines[engineId]
-    return {...state, engines}
+  [DELETE_TRAIN]: (state, { payload }) => {
+    const trainId = payload
+    const trains = {...state.trains}
+    delete trains[trainId]
+    return {...state, trains}
   },
 
   [UPDATE_TILE]: (state, { payload }) => {
@@ -198,12 +198,12 @@ export default function reducer(state=initialState, action) {
 // SELECTORS
 // ===================
 
-export function selectEngineById(state, id) {
-  return state.engines[id]
+export function selectTrainById(state, id) {
+  return state.trains[id]
 }
 
-export function selectAllEngines(state) {
-  return Object.values(state.engines)
+export function selectAllTrains(state) {
+  return Object.values(state.trains)
 }
 
 export const selectTileByPosition = (state, position) => {
@@ -223,8 +223,8 @@ export const selectAllTiles = (state) => {
 }
 
 
-export function getDestinationTile(engine, steps, tiles) {
-  const { step, entryPoint, tilePosition, speed } = engine
+export function getDestinationTile(train, steps, tiles) {
+  const { step, entryPoint, tilePosition, speed } = train
   const tile = tiles[tilePosition.toString()]
   const destStep = step + steps
 
@@ -260,7 +260,7 @@ export function getDestinationTile(engine, steps, tiles) {
   }
 
 
-  const engineParams = {
+  const trainParams = {
     step: 0,
     entryPoint: nextEntryPoint,
     tilePosition: nextTilePosition,
@@ -269,5 +269,5 @@ export function getDestinationTile(engine, steps, tiles) {
   const newDestStep = (forward)
                     ? destStep - tile.totalSteps
                     : nextTile.totalSteps + destStep // destStep is negative here
-  return getDestinationTile(engineParams, newDestStep, tiles)
+  return getDestinationTile(trainParams, newDestStep, tiles)
 }

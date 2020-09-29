@@ -5,12 +5,12 @@ import Curve from './ShapePrimitives/CurvedTrack'
 import { TILE_WIDTH, TILE_HEIGHT } from '../../../constants'
 import "./index.css"
 import { ReactComponent as RotateIcon } from '../../../img/noun_Rotate_120470.svg'
-import { ReactComponent as EngineIcon } from '../../../img/noun_Train_81514.svg'
+import { ReactComponent as TrainIcon } from '../../../img/noun_Train_81514.svg'
 import { ReactComponent as TrashIcon } from '../../../img/noun_Trash_2025448.svg'
 
 const noop = () => {}
 
-export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, rotateTile=noop, insertEngine=noop }) => {
+export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, rotateTile=noop, insertTrain=noop }) => {
   const { rotation, position, segments } = tile
   const [ x, y ] = position
   const [ hovering, setHovering ] = useState(false)
@@ -71,13 +71,13 @@ export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, ro
             onClick={() => deleteTile(tile)}
           />
 
-          <EngineIcon className="tile-control"
+          <TrainIcon className="tile-control"
             x={10}
             y={TILE_HEIGHT - 30}
             width={20}
             height={20}
             fill="white"
-            onClick={() => insertEngine(tile)}
+            onClick={() => insertTrain(tile)}
           />
 
         </>

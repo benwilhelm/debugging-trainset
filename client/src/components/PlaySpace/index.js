@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
-import Engine from './Engine'
+import Train from './Train'
 import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS } from '../../constants'
 import useAnimationFrame from '../../hooks/useAnimationFrame'
 import store, {
@@ -11,9 +11,9 @@ import store, {
   rotateTile,
   fetchTiles,
   persistTileAction,
-  addEngineToTile,
-  engineTravel,
-  selectAllEngines,
+  addTrainToTile,
+  trainTravel,
+  selectAllTrains,
   selectAllTiles,
 } from '../../store'
 import { connect } from 'react-redux'
@@ -31,15 +31,15 @@ function pageCoordsToSvgCoords(pageCoords, svg) {
 const PlaySpace = ({
   tiles,
   tilesByPosition,
-  engines,
+  trains,
   dispatchToggleSegment,
   dispatchInsertTile,
   dispatchDeleteTile,
   dispatchRotateTile,
   dispatchFetchTiles,
-  dispatchAddEngineToTile,
-  dispatchUpdateEngine,
-  dispatchEngineTravel
+  dispatchAddTrainToTile,
+  dispatchUpdateTrain,
+  dispatchTrainTravel
 }) => {
 
   const containerEl = useRef(null)
@@ -82,9 +82,9 @@ const PlaySpace = ({
 
   useAnimationFrame((deltaTime) => {
     const state = store.getState()
-    selectAllEngines(state).forEach(engine => {
-      const steps = deltaTime/1000 * engine.speed
-      dispatchEngineTravel(engine, steps)
+    selectAllTrains(state).forEach(train => {
+      const steps = deltaTime/1000 * train.speed
+      dispatchTrainTravel(train, steps)
     })
   })
 
@@ -121,15 +121,11 @@ const PlaySpace = ({
             toggleSegment={dispatchToggleSegment}
             deleteTile={dispatchDeleteTile}
             rotateTile={dispatchRotateTile}
-            insertEngine={dispatchAddEngineToTile}
+            insertTrain={dispatchAddTrainToTile}
           />
         ))}
 
-        {engines.map(engine => {
-          const tile = tilesByPosition[engine.tilePosition.toString()]
-          const { point, rotation } = tile.travelFunction(engine.step, engine.entryPoint)
-          return <Engine key={`engine-${engine.id}`} engine={engine} coordinates={point} rotation={rotation} zoomFactor={zoomFactor} />
-        })}
+        {trains.map(train => <Train train={train} tiles={tilesByPosition} zoomFactor={zoomFactor} />)}
 
       </svg>
     </div>
@@ -140,17 +136,17 @@ const PlaySpace = ({
 const mapState = (state) => ({
   tiles: selectAllTiles(state),
   tilesByPosition: state.playspace.tiles,
-  engines: selectAllEngines(state)
+  trains: selectAllTrains(state)
 })
 
 const mapDispatch = (dispatch) => ({
   dispatchDeleteTile: (tile) => dispatch(persistTileAction(tile, deleteTile)),
   dispatchInsertTile: (tile) => dispatch(persistTileAction(tile, insertTile)),
   dispatchRotateTile: (tile) => dispatch(persistTileAction(tile, rotateTile)),
-  dispatchAddEngineToTile: (tile) => dispatch(addEngineToTile(tile)),
+  dispatchAddTrainToTile: (tile) => dispatch(addTrainToTile(tile)),
   dispatchFetchTiles: (...args) => dispatch(fetchTiles(...args)),
   dispatchToggleSegment: (...args) => dispatch(toggleTileSegment(...args)),
-  dispatchEngineTravel: (...args) => dispatch(engineTravel(...args)),
+  dispatchTrainTravel: (...args) => dispatch(trainTravel(...args)),
 })
 
 

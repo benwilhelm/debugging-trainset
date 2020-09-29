@@ -1,7 +1,7 @@
 
 
 export const loop =  {
-  engines: [
+  trains: [
     { id: "A", coordinates: [ 260, 150 ], speed: 0, step: 0 }
   ],
   tiles: [
@@ -19,7 +19,7 @@ export const loop =  {
 }
 
 export const branching = {
-  engines: [
+  trains: [
     { id: "A", coordinates: [ 260, 150 ], speed: 0, step: 0 }
   ],
   tiles: [
@@ -37,7 +37,7 @@ export const branching = {
 }
 
 export const straight = {
-  engines: [
+  trains: [
     { id: "A", coordinates: [ 210, 150 ], speed: 0, step: 0 }
   ],
   tiles: [
@@ -47,7 +47,7 @@ export const straight = {
 }
 
 export const single = {
-  engines: [
+  trains: [
     { id: "A", coordinates: [ 260, 150 ], speed: 0, step: 0 }
   ],
   tiles: [

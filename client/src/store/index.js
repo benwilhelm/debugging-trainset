@@ -5,8 +5,8 @@ import playspaceReducer, {
   selectTileByPosition as selectTileByPositionFromSlice,
   selectTileByCoordinates as selectTileByCoordinatesFromSlice,
   selectAllTiles as selectAllTilesFromSlice,
-  selectEngineById as selectEngineFromSlice,
-  selectAllEngines as selectAllEnginesFromSlice
+  selectTrainById as selectTrainFromSlice,
+  selectAllTrains as selectAllTrainsFromSlice
 } from './playspace'
 
 const rootReducer = combineReducers({
@@ -23,12 +23,12 @@ export default createStore(
 
 export {
   updateTile, deleteTile, toggleTileSegment, insertTile, rotateTile,
-  fetchTiles, persistTileAction, addEngineToTile,
-  updateEngine, engineTravel, deleteEngine
+  fetchTiles, persistTileAction, addTrainToTile,
+  updateTrain, trainTravel, deleteTrain
 } from './playspace'
 
-export const selectEngineById = (state, id) => selectEngineFromSlice(state.playspace, id)
-export const selectAllEngines = (state) => selectAllEnginesFromSlice(state.playspace)
+export const selectTrainById = (state, id) => selectTrainFromSlice(state.playspace, id)
+export const selectAllTrains = (state) => selectAllTrainsFromSlice(state.playspace)
 
 export const selectTileByPosition = (state, position) => selectTileByPositionFromSlice(state.playspace, position)
 export const selectTileByCoordinates = (state, coords) => selectTileByCoordinatesFromSlice(state.playspace, coords)

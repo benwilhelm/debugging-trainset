@@ -1,29 +1,29 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { selectAllEngines, updateEngine, deleteEngine } from '../../store'
-import EngineControl from './EngineControl'
+import { selectAllTrains, updateTrain, deleteTrain } from '../../store'
+import TrainControl from './TrainControl'
 import './index.css'
 
-const Sidebar = ({ engines, dispatchUpdateEngine, dispatchDeleteEngine }) => (
+const Sidebar = ({ trains, dispatchUpdateTrain, dispatchDeleteTrain }) => (
   <div className="sidebar">
-    {engines.map(engine => (
-      <EngineControl
-        key={`engine-control-${engine.id}`}
-        engine={engine}
-        updateEngine={dispatchUpdateEngine}
-        deleteEngine={dispatchDeleteEngine}
+    {trains.map(train => (
+      <TrainControl
+        key={`train-control-${train.id}`}
+        train={train}
+        updateTrain={dispatchUpdateTrain}
+        deleteTrain={dispatchDeleteTrain}
       />
     ))}
   </div>
 )
 
 const mapState = (state) => ({
-  engines: selectAllEngines(state)
+  trains: selectAllTrains(state)
 })
 
 const mapDispatch = (dispatch) => ({
-  dispatchUpdateEngine: (...args) => dispatch(updateEngine(...args)),
-  dispatchDeleteEngine: (...args) => dispatch(deleteEngine(...args))
+  dispatchUpdateTrain: (...args) => dispatch(updateTrain(...args)),
+  dispatchDeleteTrain: (...args) => dispatch(deleteTrain(...args))
 })
 
 export default connect(mapState, mapDispatch)(Sidebar)
