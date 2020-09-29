@@ -13,6 +13,7 @@ import store, {
   persistTileAction,
   addTrainToTile,
   trainTravel,
+  stopTrain,
   selectAllTrains,
   selectAllTiles,
 } from '../../store'
@@ -39,7 +40,8 @@ const PlaySpace = ({
   dispatchFetchTiles,
   dispatchAddTrainToTile,
   dispatchUpdateTrain,
-  dispatchTrainTravel
+  dispatchTrainTravel,
+  dispatchStopTrain,
 }) => {
 
   const containerEl = useRef(null)
@@ -125,7 +127,14 @@ const PlaySpace = ({
           />
         ))}
 
-        {trains.map(train => <Train train={train} tiles={tilesByPosition} zoomFactor={zoomFactor} />)}
+        {trains.map(train => (
+          <Train
+            key={`train-${train.id}`}
+            train={train}
+            tiles={tilesByPosition}
+            zoomFactor={zoomFactor}
+            stopTrain={dispatchStopTrain}
+          />))}
 
       </svg>
     </div>
@@ -147,6 +156,7 @@ const mapDispatch = (dispatch) => ({
   dispatchFetchTiles: (...args) => dispatch(fetchTiles(...args)),
   dispatchToggleSegment: (...args) => dispatch(toggleTileSegment(...args)),
   dispatchTrainTravel: (...args) => dispatch(trainTravel(...args)),
+  dispatchStopTrain: (...args) => dispatch(stopTrain(...args))
 })
 
 

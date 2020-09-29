@@ -16,12 +16,12 @@ export default ({ train, updateTrain=noop, min=-100, max=100, step=1 }) => {
     />
 
     <datalist id={dataListId}>
-      <option value={min} label={min}></option>
-      <option value={0} label="Stop"></option>
-      <option value={max} label={max}></option>
+      <option value={min}></option>
+      <option value={0} ></option>
+      <option value={max}></option>
     </datalist>
 
-    <div style={{display: 'flex', justifyContent: 'space-between'}}>
+    <div className="train-speed-buttons">
       <button onClick={() => updateTrain({...train, speed: min})}>Reverse</button>
       <button onClick={() => updateTrain({...train, speed: 0})}>Stop</button>
       <button onClick={() => updateTrain({...train, speed: max})}>Forward</button>

@@ -30,7 +30,7 @@ export default ({ train, coordinates, rotation, highlight, zoomFactor }) => {
       />
     </g>
 
-    { (train.highlight || zoomFactor < 0.5) && (
+    { (train.highlight || zoomFactor < 0.2) && (
       <Locator coordinates={[0, -ENGINE_LENGTH/2]} color={train.colors.main} zoomFactor={zoomFactor} />
     )}
   </svg>

@@ -7,21 +7,21 @@ export default (callback) => {
   const requestRef = useRef()
   const previousTimeRef = useRef()
 
-  const animate = (time) => {
-    if (previousTimeRef.current !== undefined) {
-      const deltaTime = time - previousTimeRef.current
+  useEffect(() => {
+    const animate = (time) => {
+      if (previousTimeRef.current !== undefined) {
+        const deltaTime = time - previousTimeRef.current
 
-      const adjustedDeltaTime = deltaTime > 200 ? 16 : deltaTime
+        const adjustedDeltaTime = deltaTime > 200 ? 16 : deltaTime
 
-      callback(adjustedDeltaTime)
+        callback(adjustedDeltaTime)
+      }
+
+      previousTimeRef.current = time
+      requestRef.current = requestAnimationFrame(animate)
     }
 
-    previousTimeRef.current = time
-    requestRef.current = requestAnimationFrame(animate)
-  }
-
-  useEffect(() => {
     requestRef.current = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(requestRef.current)
-  }, [])
+  }, [callback])
 }

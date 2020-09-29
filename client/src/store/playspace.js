@@ -7,6 +7,8 @@ export const UPDATE_TRAIN = "UPDATE_TRAIN"
 export const TRAIN_TRAVEL = "TRAIN_TRAVEL"
 export const INSERT_TRAIN = "INSERT_TRAIN"
 export const DELETE_TRAIN = "DELETE_TRAIN"
+export const ADD_CAR_TO_TRAIN = "ADD_CAR_TO_TRAIN"
+export const REMOVE_CAR_FROM_TRAIN = "REMOVE_CAR_FROM_TRAIN"
 
 export const UPDATE_TILE = "UPDATE_TILE"
 export const INSERT_TILE = "INSERT_TILE"
@@ -37,6 +39,16 @@ export const trainTravel = (train, steps) => ({
 export const stopTrain = (trainId) => ({
   type: UPDATE_TRAIN,
   payload: { id: trainId, speed: 0 }
+})
+
+export const addCarToTrain = (trainId) => ({
+  type: ADD_CAR_TO_TRAIN,
+  payload: trainId
+})
+
+export const removeCarFromTrain = (trainId) => ({
+  type: REMOVE_CAR_FROM_TRAIN,
+  payload: trainId
 })
 
 export const deleteTrain = (trainId) => ({
@@ -145,6 +157,24 @@ const actionHandlers = {
       })
     }}
 
+  },
+
+  [ADD_CAR_TO_TRAIN]: (state, { payload: trainId }) => {
+    const train = state.trains[trainId]
+    train.cars += 1
+    return {...state, trains: {
+      ...state.trains,
+      [trainId]: new Train(train)
+    }}
+  },
+
+  [REMOVE_CAR_FROM_TRAIN]: (state, { payload: trainId }) => {
+    const train = state.trains[trainId]
+    train.cars = (train.cars <= 0) ? 0 : train.cars - 1
+    return {...state, trains: {
+      ...state.trains,
+      [trainId]: new Train(train)
+    }}
   },
 
   [DELETE_TRAIN]: (state, { payload }) => {

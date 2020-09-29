@@ -1,10 +1,17 @@
 .sidebar {
-  padding: 2rem 1rem 0;
+  background-color: #dec;
 }
 
 .train-control {
+  padding: 2rem 1rem;
+}
+
+.train-control:hover {
+  background-color: #fff;
+}
+
+.train-control .row {
   display: flex;
-  margin-bottom: 3rem;
 }
 
 .train-control .color-indicator {
@@ -15,7 +22,17 @@
   cursor: pointer;
 }
 
-.train-speed {
+.train-control .controls {
   padding: 0 .5rem;
   flex-grow: 999;
+}
+
+.train-speed-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.car-controls {
+  justify-content: space-between;
+  margin-bottom: .65em;
 }
