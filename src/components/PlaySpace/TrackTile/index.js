@@ -8,7 +8,7 @@ import { ReactComponent as TrashIcon } from '../../../img/noun_Trash_2025448.svg
 
 const noop = () => {}
 
-export default ({ tile, deleteTile=noop, rotateTile=noop }) => {
+const TrackTile = ({ tile, deleteTile=noop, rotateTile=noop }) => {
   const { rotation, position } = tile
   const [ x, y ] = position
   const [ hovering, setHovering ] = useState(false)
@@ -68,3 +68,4 @@ export default ({ tile, deleteTile=noop, rotateTile=noop }) => {
     </svg>
   )
 }
+export default TrackTile

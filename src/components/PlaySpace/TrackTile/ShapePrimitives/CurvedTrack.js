@@ -20,7 +20,7 @@ const RAIL_OUTER_R = TILE_WIDTH/2 + TRACK_WIDTH/2
 
 const TRUE_TIE_SPACING = QUARTER_ARC_LENGTH / Math.floor(QUARTER_ARC_LENGTH/TIE_SPACING)
 
-export default ({ rotation=0 }) => (
+const CurvedTrack = ({ rotation=0 }) => (
   <g transform={`rotate(${rotation} ${TILE_WIDTH/2} ${TILE_HEIGHT/2})`}>
     <path d={`
       M ${TILE_WIDTH/2} 0
@@ -61,3 +61,4 @@ export default ({ rotation=0 }) => (
 
   </g>
 )
+export default CurvedTrack
