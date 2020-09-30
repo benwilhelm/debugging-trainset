@@ -20,6 +20,12 @@ const TrackTile = ({ tile, deleteTile=noop, rotateTile=noop }) => {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
+      {/**
+        * <g> stands for 'group'. A <g> allows you to group elements
+        * together in order to apply transforms to all their children.
+        * <g>'s themselves have no visible component.
+        * They take CSS styles and register DOM events just like
+        * any other DOM element. */}
       <g transform={`rotate(${rotation} ${TILE_WIDTH/2} ${TILE_HEIGHT/2})`}>
         <TileBg hovering={hovering} />
 

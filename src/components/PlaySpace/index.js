@@ -5,6 +5,9 @@ import { v4 as uuid } from 'uuid'
 import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS } from '../../constants'
 import { pageCoordsToSvgCoords } from '../../util'
 
+/**
+ * The CRUD operations for all the track tiles are contained within this
+ * custom React hook. */
 const useTiles = () => {
   const [ tiles, setTiles ] = useState({})
 
@@ -41,6 +44,14 @@ const useTiles = () => {
   }
 }
 
+
+/**
+ * Likewise, I've extracted the zooming behavior into its own hook, which exports
+ * the event handler function for the mousewheel in order to zoom in and out
+ * on the mouse's current position
+ * Here's a great article to better understand SVG scaling and the viewbox:
+ * https://css-tricks.com/scale-svg/
+ * PRO TIP: You don't need to worry about this for this exercise */
 const useZoomableSvg = () => {
 
   const containerEl = useRef(null)
@@ -87,11 +98,15 @@ const useZoomableSvg = () => {
 
 const PlaySpace = () => {
 
+  // see notes above for these two custom hooks
   const { viewBox, zoomHandler, containerEl, svgEl } = useZoomableSvg()
-
-  const [ tilePosition, setTilePosition ] = useState([0, 0])
   const { tilesCollection, insertTile, rotateTile, deleteTile } = useTiles()
 
+  // Moving the cursor around the playspace constantly converts the current
+  // coordinates within the browser window into the appropriate coordinates
+  // within the SVG, saving the [x,y] position of the current tile square
+  // to state.
+  const [ tilePosition, setTilePosition ] = useState([0, 0])
   const handleMouseMove = (evt) => {
     const [x, y] = pageCoordsToSvgCoords([evt.clientX, evt.clientY], svgEl.current)
     setTilePosition([
@@ -100,15 +115,22 @@ const PlaySpace = () => {
     ])
   }
 
+  // The PlaySpace component itself is an SVG graphic. Zooming in and out
+  // changes the viewBox attribute, which determines which part of the graphic
+  // is shown. The `viewBox` variable is returned from the custom
+  // `useZoomableSvg` hook defined above.
   return (
     <div className="playspace" ref={containerEl}>
       <svg ref={svgEl}
+           viewBox={viewBox.join(' ')}
            style={{backgroundColor: COLOR_GRASS}}
-           viewBox={viewBox.join(' ')} xmlns="http://www.w3.org/2000/svg"
+           xmlns="http://www.w3.org/2000/svg"
            onMouseMove={handleMouseMove}
            onWheel={zoomHandler}
       >
+
         <HoverIndicator tilePosition={tilePosition} insertTile={insertTile} />
+
         {tilesCollection.map((tile) => (
           <TrackTile key={tile.position}
             tile={tile}
