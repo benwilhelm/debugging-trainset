@@ -19,7 +19,7 @@ const RAIL_RIGHT_X = TILE_WIDTH/2 + TRACK_WIDTH/2
 // bunching or gaps at tile seams
 const TRUE_TIE_SPACING = TILE_HEIGHT / Math.floor(TILE_HEIGHT/TIE_SPACING)
 
-export default ({rotation=0}) => (
+const StraightTrack = ({rotation=0}) => (
   <g transform={`rotate(${rotation} ${TILE_WIDTH/2} ${TILE_HEIGHT/2})`}>
     <line
       x1={TILE_WIDTH/2}
@@ -52,3 +52,4 @@ export default ({rotation=0}) => (
     />
   </g>
 )
+export default StraightTrack
