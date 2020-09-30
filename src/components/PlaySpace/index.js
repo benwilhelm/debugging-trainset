@@ -30,8 +30,8 @@ const useTiles = () => {
   })
 
   const rotateTile = (tile) => {
-    tile.rotation = (tile.rotation + 90) % 360
-    return updateTile({...tile})
+    const rotation = (tile.rotation + 90) % 360
+    return updateTile({...tile, rotation})
   }
 
   return {
