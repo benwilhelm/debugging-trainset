@@ -9,6 +9,11 @@ const HoverIndicator = ({tilePosition, insertTile=noop}) => {
   const [ x, y ] = tilePosition
   const newTile = (type) => ({ type, rotation: 0, position: tilePosition })
 
+  // This component is rendered by the PlaySpace component, which itself
+  // returns an SVG.
+  // Notice that we are returning an SVG here. Nesting SVGs is totally valid.
+  // The x/y/width/height attributes determine the height of this component
+  // relative to the parent SVG's coordinate space
   return (
     <svg x={x*TILE_WIDTH} y={y*TILE_HEIGHT} width={TILE_WIDTH} height={TILE_HEIGHT}>
 
@@ -20,6 +25,12 @@ const HoverIndicator = ({tilePosition, insertTile=noop}) => {
         fill={COLOR_GRASS_HOVER}
       />
 
+      {/**
+        * <g> stands for 'group'. A <g> allows you to group elements
+        * together in order to apply transforms to all their children.
+        * <g>'s themselves have no visible component.
+        * They take CSS styles and register DOM events just like
+        * any other DOM element. */}
       <g transform="scale(0.4)">
         <g onClick={() => insertTile(newTile("STRAIGHT"))}
            transform={`translate(${0.1*TILE_WIDTH}, ${0.1*TILE_HEIGHT})`}
