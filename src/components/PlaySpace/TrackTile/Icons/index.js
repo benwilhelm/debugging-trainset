@@ -1,4 +1,4 @@
-export { default as Straight } from './Straight'
-export { default as Curve } from './Curve'
-export { default as YLeft } from './YLeft'
-export { default as YRight } from './YRight'
+export { default as IconStraight } from './Straight'
+export { default as IconCurve } from './Curve'
+export { default as IconYLeft } from './YLeft'
+export { default as IconYRight } from './YRight'
