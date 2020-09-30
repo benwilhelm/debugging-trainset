@@ -19,3 +19,12 @@ export const cartesianFromPolar = ([r, theta]) => ([
 ])
 
 export const degreesFromRadians = (theta) => theta * (180 / Math.PI)
+
+export const pageCoordsToSvgCoords = (pageCoords, svg) => {
+  const [ pageX, pageY ] = pageCoords
+  const pt = svg.createSVGPoint()
+  pt.x = pageX
+  pt.y = pageY
+  const { x, y } = pt.matrixTransform(svg.getScreenCTM().inverse())
+  return [ x, y ]
+}

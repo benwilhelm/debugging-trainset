@@ -3,15 +3,7 @@ import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
 import { v4 as uuid } from 'uuid'
 import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS } from '../../constants'
-
-function pageCoordsToSvgCoords(pageCoords, svg) {
-  const [ pageX, pageY ] = pageCoords
-  const pt = svg.createSVGPoint()
-  pt.x = pageX
-  pt.y = pageY
-  const { x, y } = pt.matrixTransform(svg.getScreenCTM().inverse())
-  return [ x, y ]
-}
+import { pageCoordsToSvgCoords } from '../../util'
 
 const useTiles = () => {
   const [ tiles, setTiles ] = useState({})
