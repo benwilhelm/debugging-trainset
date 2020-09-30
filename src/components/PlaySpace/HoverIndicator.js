@@ -1,6 +1,6 @@
 import React from 'react'
 import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS_HOVER} from '../../constants'
-import { Straight, Curve, YLeft, YRight } from './TrackTile/Icons'
+import { IconStraight, IconCurve, IconYLeft, IconYRight } from './TrackTile/Icons'
 import './HoverIndicator.css'
 
 const noop = () => {}
@@ -11,7 +11,6 @@ const HoverIndicator = ({tilePosition, insertTile=noop}) => {
 
   return (
     <svg x={x*TILE_WIDTH} y={y*TILE_HEIGHT} width={TILE_WIDTH} height={TILE_HEIGHT}>
-
 
       <rect
         x={0}
@@ -26,28 +25,28 @@ const HoverIndicator = ({tilePosition, insertTile=noop}) => {
            transform={`translate(${0.1*TILE_WIDTH}, ${0.1*TILE_HEIGHT})`}
            style={{cursor: 'pointer'}}
         >
-          <Straight rotation={0} />
+          <IconStraight rotation={0} />
         </g>
 
         <g onClick={() => insertTile(newTile("CURVE"))}
            transform={`translate(${1.4*TILE_WIDTH}, ${0.1*TILE_HEIGHT})`}
            style={{cursor: 'pointer'}}
         >
-          <Curve rotation={0} />
+          <IconCurve rotation={0} />
         </g>
 
         <g onClick={() => insertTile(newTile("YLEFT"))}
            transform={`translate(${0.1*TILE_WIDTH}, ${1.4*TILE_HEIGHT})`}
            style={{cursor: 'pointer'}}
         >
-          <YLeft rotation={0} />
+          <IconYLeft rotation={0} />
         </g>
 
         <g onClick={() => insertTile(newTile("YRIGHT"))}
            transform={`translate(${1.4*TILE_WIDTH}, ${1.4*TILE_HEIGHT})`}
            style={{cursor: 'pointer'}}
         >
-          <YRight rotation={0} />
+          <IconYRight rotation={0} />
         </g>
 
       </g>
