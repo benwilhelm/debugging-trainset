@@ -10,7 +10,7 @@ import { ReactComponent as TrashIcon } from '../../../img/noun_Trash_2025448.svg
 
 const noop = () => {}
 
-export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, rotateTile=noop, insertTrain=noop }) => {
+const TrackTile = ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, rotateTile=noop, insertTrain=noop }) => {
   const { rotation, position, segments } = tile
   const [ x, y ] = position
   const [ hovering, setHovering ] = useState(false)
@@ -85,3 +85,4 @@ export default ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop, ro
     </svg>
   )
 }
+export default TrackTile

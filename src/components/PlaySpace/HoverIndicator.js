@@ -5,7 +5,7 @@ import './HoverIndicator.css'
 
 const noop = () => {}
 
-export default ({tileCoords, insertTile=noop}) => {
+const HoverIndicator = ({tileCoords, insertTile=noop}) => {
   const [ x, y ] = tileCoords
   const newTile = (type) => ({ type, rotation: 0, position: tileCoords })
 
@@ -55,3 +55,4 @@ export default ({tileCoords, insertTile=noop}) => {
     </svg>
   )
 }
+export default HoverIndicator
