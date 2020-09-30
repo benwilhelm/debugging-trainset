@@ -1,13 +1,13 @@
 import React from 'react'
 import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS_HOVER} from '../../constants'
-import { Straight, Curve, YLeft, YRight } from './TrackTile'
+import { Straight, Curve, YLeft, YRight } from './TrackTile/Icons'
 import './HoverIndicator.css'
 
 const noop = () => {}
 
-export default ({tileCoords, insertTile=noop}) => {
-  const [ x, y ] = tileCoords
-  const newTile = (type) => ({ type, rotation: 0, position: tileCoords })
+export default ({tilePosition, insertTile=noop}) => {
+  const [ x, y ] = tilePosition
+  const newTile = (type) => ({ type, rotation: 0, position: tilePosition })
 
   return (
     <svg x={x*TILE_WIDTH} y={y*TILE_HEIGHT} width={TILE_WIDTH} height={TILE_HEIGHT}>

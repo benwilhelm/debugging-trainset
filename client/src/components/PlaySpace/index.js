@@ -1,24 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
-import Train from './Train'
+import { v4 as uuid } from 'uuid'
 import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS } from '../../constants'
-import useAnimationFrame from '../../hooks/useAnimationFrame'
-import store, {
-  toggleTileSegment,
-  insertTile,
-  deleteTile,
-  rotateTile,
-  fetchTiles,
-  persistTileAction,
-  addTrainToTile,
-  trainTravel,
-  stopTrain,
-  selectAllTrains,
-  selectAllTiles,
-} from '../../store'
-import { connect } from 'react-redux'
-
 
 function pageCoordsToSvgCoords(pageCoords, svg) {
   const [ pageX, pageY ] = pageCoords
@@ -29,40 +13,49 @@ function pageCoordsToSvgCoords(pageCoords, svg) {
   return [ x, y ]
 }
 
-const PlaySpace = ({
-  tiles,
-  tilesByPosition,
-  trains,
-  dispatchToggleSegment,
-  dispatchInsertTile,
-  dispatchDeleteTile,
-  dispatchRotateTile,
-  dispatchFetchTiles,
-  dispatchAddTrainToTile,
-  dispatchUpdateTrain,
-  dispatchTrainTravel,
-  dispatchStopTrain,
-}) => {
+const useTiles = () => {
+  const [ tiles, setTiles ] = useState({})
+
+  const insertTile = (tile) => {
+    setTiles(tiles => {
+      const id = uuid()
+      return { ...tiles, [id]: { ...tile, id }}
+    }
+  )}
+
+  const deleteTile = (tile) => setTiles(tiles => {
+    delete tiles[tile.id]
+    return {...tiles}
+  })
+
+  const updateTile = (params) => setTiles(tiles => {
+    const tile = tiles[params.id]
+    const updatedTile = {...tile, ...params}
+    return { ...tiles, [params.id]: updatedTile}
+  })
+
+  const rotateTile = (tile) => {
+    tile.rotation = (tile.rotation + 90) % 360
+    return updateTile({...tile})
+  }
+
+  return {
+    tilesById: tiles,
+    tilesCollection: Object.values(tiles),
+    insertTile,
+    deleteTile,
+    updateTile,
+    rotateTile
+  }
+}
+
+const useZoomableSvg = () => {
 
   const containerEl = useRef(null)
   const svgEl = useRef(null)
-
   const [viewBox, setViewBox] = useState([0, 0, 800, 400 ])
-  const [ tileCoords, setTileCoords ] = useState([0, 0])
 
-  useEffect(() => {
-    dispatchFetchTiles()
-  }, [dispatchFetchTiles])
-
-  const handleMouseMove = (evt) => {
-    const [x, y] = pageCoordsToSvgCoords([evt.clientX, evt.clientY], svgEl.current)
-    setTileCoords([
-      Math.floor(x / TILE_WIDTH),
-      Math.floor(y / TILE_HEIGHT)
-    ])
-  }
-
-  const handleMouseWheel = (e) => {
+  const zoomHandler = (e) => {
     const [ pointerX, pointerY ] = pageCoordsToSvgCoords([e.clientX, e.clientY], svgEl.current)
     const factor = (e.deltaY > 0)
                  ? 1 + (0.001 * e.deltaY)
@@ -82,14 +75,6 @@ const PlaySpace = ({
     }))
   }
 
-  useAnimationFrame((deltaTime) => {
-    const state = store.getState()
-    selectAllTrains(state).forEach(train => {
-      const steps = deltaTime/1000 * train.speed
-      dispatchTrainTravel(train, steps)
-    })
-  })
-
   useEffect(() => {
     const updateViewBoxAspect = () => {
       const aspect = containerEl.current
@@ -97,16 +82,31 @@ const PlaySpace = ({
                    : 2 / 1
       setViewBox(([ x, y, w, h]) => ([x, y, w, w/aspect]), [])
     }
-
     updateViewBoxAspect()
     window.addEventListener('resize', updateViewBoxAspect)
-
     return () => window.removeEventListener('resize', updateViewBoxAspect)
-  }, [])
+  }, [containerEl])
 
-  const zoomFactor = containerEl.current
-                   ? containerEl.current.clientWidth / viewBox[2]
-                   : 1
+  return { viewBox, zoomHandler, containerEl, svgEl }
+}
+
+
+
+
+const PlaySpace = () => {
+
+  const { viewBox, zoomHandler, containerEl, svgEl } = useZoomableSvg()
+
+  const [ tilePosition, setTilePosition ] = useState([0, 0])
+  const { tilesCollection, insertTile, rotateTile, deleteTile } = useTiles()
+
+  const handleMouseMove = (evt) => {
+    const [x, y] = pageCoordsToSvgCoords([evt.clientX, evt.clientY], svgEl.current)
+    setTilePosition([
+      Math.floor(x / TILE_WIDTH),
+      Math.floor(y / TILE_HEIGHT)
+    ])
+  }
 
   return (
     <div className="playspace" ref={containerEl}>
@@ -114,27 +114,16 @@ const PlaySpace = ({
            style={{backgroundColor: COLOR_GRASS}}
            viewBox={viewBox.join(' ')} xmlns="http://www.w3.org/2000/svg"
            onMouseMove={handleMouseMove}
-           onWheel={handleMouseWheel}
+           onWheel={zoomHandler}
       >
-        <HoverIndicator tileCoords={tileCoords} insertTile={dispatchInsertTile} />
-        {tiles.map((tile) => (
+        <HoverIndicator tilePosition={tilePosition} insertTile={insertTile} />
+        {tilesCollection.map((tile) => (
           <TrackTile key={tile.position}
             tile={tile}
-            toggleSegment={dispatchToggleSegment}
-            deleteTile={dispatchDeleteTile}
-            rotateTile={dispatchRotateTile}
-            insertTrain={dispatchAddTrainToTile}
+            deleteTile={deleteTile}
+            rotateTile={rotateTile}
           />
         ))}
-
-        {trains.map(train => (
-          <Train
-            key={`train-${train.id}`}
-            train={train}
-            tiles={tilesByPosition}
-            zoomFactor={zoomFactor}
-            stopTrain={dispatchStopTrain}
-          />))}
 
       </svg>
     </div>
@@ -142,22 +131,4 @@ const PlaySpace = ({
   )
 }
 
-const mapState = (state) => ({
-  tiles: selectAllTiles(state),
-  tilesByPosition: state.playspace.tiles,
-  trains: selectAllTrains(state)
-})
-
-const mapDispatch = (dispatch) => ({
-  dispatchDeleteTile: (tile) => dispatch(persistTileAction(tile, deleteTile)),
-  dispatchInsertTile: (tile) => dispatch(persistTileAction(tile, insertTile)),
-  dispatchRotateTile: (tile) => dispatch(persistTileAction(tile, rotateTile)),
-  dispatchAddTrainToTile: (tile) => dispatch(addTrainToTile(tile)),
-  dispatchFetchTiles: (...args) => dispatch(fetchTiles(...args)),
-  dispatchToggleSegment: (...args) => dispatch(toggleTileSegment(...args)),
-  dispatchTrainTravel: (...args) => dispatch(trainTravel(...args)),
-  dispatchStopTrain: (...args) => dispatch(stopTrain(...args))
-})
-
-
-export default connect(mapState, mapDispatch)(PlaySpace)
+export default PlaySpace
