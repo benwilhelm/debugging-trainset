@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
 import Train from './Train'
-import { TILE_WIDTH, TILE_HEIGHT, COLOR_GRASS } from '../../constants'
+import useTilePosition from './useTilePosition'
+import useZoomableSvg from './useZoomableSvg'
+import { COLOR_GRASS } from '../../constants'
 import useAnimationFrame from '../../hooks/useAnimationFrame'
 import store, {
   toggleTileSegment,
@@ -18,7 +20,6 @@ import store, {
   selectAllTrains,
   selectAllTiles,
 } from '../../store'
-import  { pageCoordsToSvgCoords } from '../../util'
 
 
 const PlaySpace = ({
@@ -36,43 +37,13 @@ const PlaySpace = ({
   dispatchStopTrain,
 }) => {
 
-  const containerEl = useRef(null)
-  const svgEl = useRef(null)
-
-  const [viewBox, setViewBox] = useState([0, 0, 800, 400 ])
-  const [ tileCoords, setTileCoords ] = useState([0, 0])
+  const { containerEl, svgEl, viewBox, zoomHandler } = useZoomableSvg()
+  const { handleMouseMove, tilePosition } = useTilePosition(svgEl)
 
   useEffect(() => {
     dispatchFetchTiles()
   }, [dispatchFetchTiles])
 
-  const handleMouseMove = (evt) => {
-    const [x, y] = pageCoordsToSvgCoords([evt.clientX, evt.clientY], svgEl.current)
-    setTileCoords([
-      Math.floor(x / TILE_WIDTH),
-      Math.floor(y / TILE_HEIGHT)
-    ])
-  }
-
-  const handleMouseWheel = (e) => {
-    const [ pointerX, pointerY ] = pageCoordsToSvgCoords([e.clientX, e.clientY], svgEl.current)
-    const factor = (e.deltaY > 0)
-                 ? 1 + (0.001 * e.deltaY)
-                 : 1 - (0.001 * Math.abs(e.deltaY))
-
-    requestAnimationFrame(() => setViewBox(([x, y, w, h]) => {
-      const weightX = (pointerX - x) / w
-      const weightY = (pointerY - y) / h
-
-      const newW = w * factor
-      const newH = h * factor
-
-      const newX = x - ((newW - w) * weightX)
-      const newY = y - ((newH - h) * weightY)
-
-      return [ newX, newY, newW, newH ]
-    }))
-  }
 
   useAnimationFrame((deltaTime) => {
     const state = store.getState()
@@ -82,19 +53,6 @@ const PlaySpace = ({
     })
   })
 
-  useEffect(() => {
-    const updateViewBoxAspect = () => {
-      const aspect = containerEl.current
-                   ? containerEl.current.clientWidth / containerEl.current.clientHeight
-                   : 2 / 1
-      setViewBox(([ x, y, w, h]) => ([x, y, w, w/aspect]), [])
-    }
-
-    updateViewBoxAspect()
-    window.addEventListener('resize', updateViewBoxAspect)
-
-    return () => window.removeEventListener('resize', updateViewBoxAspect)
-  }, [])
 
   const zoomFactor = containerEl.current
                    ? containerEl.current.clientWidth / viewBox[2]
@@ -106,9 +64,9 @@ const PlaySpace = ({
            style={{backgroundColor: COLOR_GRASS}}
            viewBox={viewBox.join(' ')} xmlns="http://www.w3.org/2000/svg"
            onMouseMove={handleMouseMove}
-           onWheel={handleMouseWheel}
+           onWheel={zoomHandler}
       >
-        <HoverIndicator tileCoords={tileCoords} insertTile={dispatchInsertTile} />
+        <HoverIndicator tilePosition={tilePosition} insertTile={dispatchInsertTile} />
         {tiles.map((tile) => (
           <TrackTile key={tile.position}
             tile={tile}
