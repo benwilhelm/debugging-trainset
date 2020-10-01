@@ -61,7 +61,7 @@ export const addTrainToTile = (tile) => {
     type: INSERT_TRAIN,
     payload: {
       tilePosition: tile.position,
-      entryPoint: tile.from,
+      tileDirection: tile.from,
       step: 10,
     }
   }
@@ -141,7 +141,7 @@ const actionHandlers = {
     const {
       tilePosition,
       step,
-      entryPoint,
+      tileDirection,
       speed,
     } = getDestinationTile(train, steps, state.tiles)
 
@@ -152,7 +152,7 @@ const actionHandlers = {
         ...train,
         step,
         tilePosition,
-        entryPoint,
+        tileDirection,
         speed
       })
     }}
@@ -254,37 +254,38 @@ export const selectAllTiles = (state) => {
 
 
 export function getDestinationTile(train, steps, tiles) {
-  const { step, entryPoint, tilePosition, speed } = train
+  const { step, tileDirection, tilePosition, speed } = train
   const tile = tiles[tilePosition.toString()]
   const destStep = step + steps
 
   if (destStep >=0 && destStep < tile.totalSteps) {
-    return { step: destStep, entryPoint, tilePosition, speed}
+    return { step: destStep, tileDirection, tilePosition, speed}
   }
 
 
   const forward = (destStep >= 0)
   const nextTilePosition = (forward)
-                         ? tile.nextTilePosition(entryPoint)
-                         : tile.previousTilePosition(entryPoint)
+                         ? tile.nextTilePosition(tileDirection)
+                         : tile.previousTilePosition(tileDirection)
   const nextTile = tiles[nextTilePosition.toString()]
   if (!nextTile) {
     return {
       step: (forward) ? tile.totalSteps : 0,
       speed: 0,
-      entryPoint,
+      tileDirection,
       tilePosition,
     }
   }
 
   const borderStep = (forward) ? tile.totalSteps + 1 : -1
-  const { point: borderCoords } = tile.travelFunction(borderStep, entryPoint)
-  const nextEntryPoint = nextTile.getReferencePoint(borderCoords, speed)
-  if (!nextEntryPoint) {
+  const { point: borderCoords } = tile.travelFunction(borderStep, tileDirection)
+  const trainDirection = steps >= 0 ? 1 : -1
+  const nextTileDirection = nextTile.getTravelDirectionFromEntryPoint(borderCoords, trainDirection)
+  if (!nextTileDirection) {
     return {
       step: (forward) ? tile.totalSteps : 0,
       speed: 0,
-      entryPoint,
+      tileDirection,
       tilePosition,
     }
   }
@@ -292,7 +293,7 @@ export function getDestinationTile(train, steps, tiles) {
 
   const trainParams = {
     step: 0,
-    entryPoint: nextEntryPoint,
+    tileDirection: nextTileDirection,
     tilePosition: nextTilePosition,
     speed
   }

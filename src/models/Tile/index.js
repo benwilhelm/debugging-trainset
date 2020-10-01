@@ -53,14 +53,12 @@ export default class Tile {
     return borders[adjustedIndex]
   }
 
-  travelFunction(step, entryPoint) {
-    const validEntry = this.validEntryPoint(entryPoint)
-    if (!validEntry)
-      throw new Error("Invalid Entry Point")
-
+  travelFunction(step, tileDirection) {
     const segment = this.segments[this.selectedSegment]
-    // going through it 'backwards'
-    if (validEntry === -1)
+
+    // if going through it 'backwards' from the Tile's perspective,
+    // ie: train's nose is pointing toward the zero point of the travel function
+    if (tileDirection === -1)
       step = reflectOver(step, (segment.totalSteps / 2))
 
     const {rotation: carRotation, point: [x, y]} = segment.travelFunction(step)
@@ -71,7 +69,7 @@ export default class Tile {
                   : (totalRotation === 270) ? [  (y-ay) + ax, -(x-ax) + ay ]
                   : [x, y]
     return {
-      rotation: totalRotation + carRotation + (validEntry === -1 ? 180 : 0),
+      rotation: totalRotation + carRotation + (tileDirection === -1 ? 180 : 0),
       point: [
         rotated[0] + this.position[0] * TILE_WIDTH,
         rotated[1] + this.position[1] * TILE_HEIGHT
@@ -79,37 +77,30 @@ export default class Tile {
     }
   }
 
-  nextTilePosition(entryPoint) {
-    const location = this.travelFunction(this.totalSteps+1, entryPoint)
+  nextTilePosition(tileDirection) {
+    const location = this.travelFunction(this.totalSteps+1, tileDirection)
     return tilePositionFromCoordinates(location.point)
   }
 
-  previousTilePosition(entryPoint) {
-    const location = this.travelFunction(-1, entryPoint)
+  previousTilePosition(tileDirection) {
+    const location = this.travelFunction(-1, tileDirection)
     return tilePositionFromCoordinates(location.point)
   }
 
-  validEntryPoint(entryPoint) {
-    const segment = this.segments[this.selectedSegment]
-    return (entryPoint === segment.from) ?  1
-         : (entryPoint === segment.to)   ? -1
-         : 0
-  }
-
-  getReferencePoint(coordinates, speed) {
-    const forward = (speed >= 0)
+  getTravelDirectionFromEntryPoint(coordinates, engineDirection) {
+    const forward = (engineDirection >= 0)
     const trueEntryPoint = this.closestEntryPoint(coordinates)
     const segment = this.segments[this.selectedSegment]
 
     if (trueEntryPoint === segment.from) {
-      return (forward) ? segment.from : segment.to
+      return (forward) ? 1 : -1
     }
 
     if (trueEntryPoint === segment.to) {
-      return (forward) ? segment.to : segment.from
+      return (forward) ? -1 : 1
     }
 
-    return null
+    return 0
   }
 }
 

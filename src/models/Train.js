@@ -17,10 +17,10 @@ const getColorScheme = () => {
 }
 
 export default class Train {
-  constructor({id, tilePosition, entryPoint, colors, speed=0, step=0, highlight=false, cars=3 }) {
+  constructor({id, tilePosition, tileDirection, colors, speed=0, step=0, highlight=false, cars=3 }) {
     this.id = id || uuid()
     this.tilePosition = tilePosition
-    this.entryPoint = entryPoint
+    this.tileDirection = tileDirection
     this.speed = speed
     this.step = step
     this.colors = colors || getColorScheme()

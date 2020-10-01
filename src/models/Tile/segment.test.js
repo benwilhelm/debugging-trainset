@@ -1,5 +1,5 @@
 import segmentFactory from './segment'
-import { EntryPointError } from './error-types'
+import { TileDirectionError } from './error-types'
 import { TILE_WIDTH, TILE_HEIGHT, HALF_WIDTH, HALF_HEIGHT, QUARTER_ARC_LENGTH } from '../../constants'
 
 describe("SegmentCurve", () => {

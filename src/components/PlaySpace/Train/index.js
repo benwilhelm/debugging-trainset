@@ -8,12 +8,12 @@ import { getDestinationTile } from '../../../store/playspace'
 
 export default ({ train, tiles, zoomFactor, stopTrain }) => {
   const tile = tiles[train.tilePosition.toString()]
-  const { point, rotation } = tile.travelFunction(train.step, train.entryPoint)
+  const { point, rotation } = tile.travelFunction(train.step, train.tileDirection)
 
   const carLocations = (range(train.cars)).map(i => {
-    const car = getDestinationTile({...train, speed: -10}, -50 * (i+1), tiles)
+    const car = getDestinationTile(train, -50 * (i+1), tiles)
     const carTile = tiles[car.tilePosition.toString()]
-    return {...carTile.travelFunction(car.step, car.entryPoint), speed: car.speed}
+    return carTile.travelFunction(car.step, car.tileDirection)
   })
 
   const stopped = carLocations.map(loc => loc.speed).includes(0)

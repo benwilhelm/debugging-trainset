@@ -1,7 +1,7 @@
-export class EntryPointError extends Error {
+export class TileDirectionError extends Error {
   constructor(message) {
     super(message)
-    this.name = "EntryPointError"
+    this.name = "TileDirectionError"
   }
 }
 

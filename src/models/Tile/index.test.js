@@ -38,14 +38,14 @@ describe('Tile class', () => {
   describe('nextTilePosition()', () => {
     test('should give position of next tile', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0, 0]})
-      expect(tile.nextTilePosition('negY')).toEqual([0, 1])
-      expect(tile.nextTilePosition('posY')).toEqual([0, -1])
+      expect(tile.nextTilePosition(1)).toEqual([0, 1])
+      expect(tile.nextTilePosition(-1)).toEqual([0, -1])
     })
 
     test('should account for rotation, etc', () => {
       const tile = new Tile({ type: 'YLEFT', rotation: 180, selectedSegment: 1, position: [2,2]})
-      expect(tile.nextTilePosition('negY')).toEqual([ 2, 3 ])
-      expect(tile.nextTilePosition('negX')).toEqual([ 1, 2 ])
+      expect(tile.nextTilePosition(1)).toEqual([ 2, 3 ])
+      expect(tile.nextTilePosition(-1)).toEqual([ 1, 2 ])
     })
   })
 
@@ -53,18 +53,18 @@ describe('Tile class', () => {
   describe('previousTilePosition()', () => {
     test('should give position of next tile', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0, 0]})
-      expect(tile.previousTilePosition('posY')).toEqual([0, 1])
-      expect(tile.previousTilePosition('negY')).toEqual([0, -1])
+      expect(tile.previousTilePosition(1)).toEqual([0, -1])
+      expect(tile.previousTilePosition(-1)).toEqual([0, 1])
     })
 
     test('should account for rotation, etc', () => {
       const tile = new Tile({ type: 'YLEFT', rotation: 180, selectedSegment: 1, position: [2,2]})
-      expect(tile.previousTilePosition('negX')).toEqual([ 2, 3 ])
-      expect(tile.previousTilePosition('negY')).toEqual([ 1, 2 ])
+      expect(tile.previousTilePosition(1)).toEqual([ 1, 2 ])
+      expect(tile.previousTilePosition(-1)).toEqual([ 2, 3 ])
     })
   })
 
-  
+
   describe('closestEntryPoint()', () => {
     test('basic case with no rotation', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0, 0]})
@@ -109,64 +109,64 @@ describe('Tile class', () => {
     })
   })
 
-  describe('getReferencePoint()', () => {
-    test('should return `from` when entering `from` forwards', () => {
+  describe('getTravelDirectionFromEntryPoint()', () => {
+    test('should return 1 when entering `from` forwards', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0,0] })
-      const referencePoint = tile.getReferencePoint([HALF_WIDTH, 0], 1)
-      expect(referencePoint).toEqual('negY')
+      const referencePoint = tile.getTravelDirectionFromEntryPoint([HALF_WIDTH, 0], 1)
+      expect(referencePoint).toEqual(1)
     })
 
-    test('should return `to` when entering `from` backwards', () => {
+    test('should return -1 when entering `from` backwards', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0, 0]})
-      const referencePoint = tile.getReferencePoint([HALF_WIDTH, 0], -1)
-      expect(referencePoint).toEqual('posY')
+      const referencePoint = tile.getTravelDirectionFromEntryPoint([HALF_WIDTH, 0], -1)
+      expect(referencePoint).toEqual(-1)
     })
 
-    test('should return `to` when entering `to` forwards', () => {
+    test('should return -1 when entering `to` forwards', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0,0] })
-      const referencePoint = tile.getReferencePoint([HALF_WIDTH, TILE_HEIGHT], 1)
-      expect(referencePoint).toEqual('posY')
+      const referencePoint = tile.getTravelDirectionFromEntryPoint([HALF_WIDTH, TILE_HEIGHT], 1)
+      expect(referencePoint).toEqual(-1)
     })
 
-    test('should return `from` when entering `to` backwards', () => {
+    test('should return 1 when entering `to` backwards', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0,0] })
-      const referencePoint = tile.getReferencePoint([HALF_WIDTH, TILE_HEIGHT], -1)
-      expect(referencePoint).toEqual('negY')
+      const referencePoint = tile.getTravelDirectionFromEntryPoint([HALF_WIDTH, TILE_HEIGHT], -1)
+      expect(referencePoint).toEqual(1)
     })
 
-    test('should return null for other entry points', () => {
+    test('should return 0 for other entry points', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0,0] })
-      const referencePoint = tile.getReferencePoint([TILE_WIDTH, HALF_HEIGHT], -1)
-      expect(referencePoint).toBeNull()
+      const referencePoint = tile.getTravelDirectionFromEntryPoint([TILE_WIDTH, HALF_HEIGHT], -1)
+      expect(referencePoint).toEqual(0)
     })
   })
 
   describe('travelFunction()', () => {
     test('applies the position and rotation to selected segment\'s travel function', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [1, 2], rotation: 90})
-      const start = tile.travelFunction(0, 'negY')
+      const start = tile.travelFunction(0, 1)
       expect(start.point).toEqual([200, 250])
       expect(start.rotation).toEqual(90)
 
-      const end = tile.travelFunction(TILE_HEIGHT, 'negY')
+      const end = tile.travelFunction(TILE_HEIGHT, 1)
       expect(end.point).toEqual([100, 250])
       expect(end.rotation).toEqual(90)
     })
 
     test('reflects step over midpoint and rotates train when traveling upstream', () => {
       const tile = new Tile({ type: 'STRAIGHT', position: [0, 0], rotation: 90})
-      const start = tile.travelFunction(0, 'posY')
+      const start = tile.travelFunction(0, -1)
       expect(start.point).toEqual([0, 50])
       expect(start.rotation).toEqual(270)
 
-      const end = tile.travelFunction(TILE_HEIGHT, 'posY')
+      const end = tile.travelFunction(TILE_HEIGHT, -1)
       expect(end.point).toEqual([100, 50])
       expect(end.rotation).toEqual(270)
     })
 
     test('accounts for rotated segments', () => {
       const tile = new Tile({ type: 'YLEFT', position: [1, 2], rotation: 90, selectedSegment: 1})
-      const next = tile.travelFunction(0, 'negY')
+      const next = tile.travelFunction(0, 1)
       expect(next.point).toEqual([150, 300])
       expect(next.rotation).toEqual(180)
     })
