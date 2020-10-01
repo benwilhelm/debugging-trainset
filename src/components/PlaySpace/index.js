@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { connect } from 'react-redux'
 import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
 import Train from './Train'
@@ -17,17 +18,8 @@ import store, {
   selectAllTrains,
   selectAllTiles,
 } from '../../store'
-import { connect } from 'react-redux'
+import  { pageCoordsToSvgCoords } from '../../util'
 
-
-function pageCoordsToSvgCoords(pageCoords, svg) {
-  const [ pageX, pageY ] = pageCoords
-  const pt = svg.createSVGPoint()
-  pt.x = pageX
-  pt.y = pageY
-  const { x, y } = pt.matrixTransform(svg.getScreenCTM().inverse())
-  return [ x, y ]
-}
 
 const PlaySpace = ({
   tiles,
