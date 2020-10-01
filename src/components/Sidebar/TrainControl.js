@@ -18,11 +18,11 @@ export default ({ train, updateTrain, deleteTrain, addCar, removeCar }) => {
   return (
     <div className="train-control" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <div className="row">
-        <ColorIndicator color={train.colors.main} onClick={() => deleteTrain(train.id)} />
+        <ColorIndicator color={train.colors.main} onClick={() => deleteTrain(train)} />
         <div className="controls">
           <div className="row car-controls">
-            <button onClick={() => removeCar(train.id)}>Remove Car</button>
-            <button onClick={() => addCar(train.id)}>Add Car</button>
+            <button onClick={() => removeCar(train)}>Remove Car</button>
+            <button onClick={() => addCar(train)}>Add Car</button>
           </div>
           <TrainSpeed
             updateTrain={updateTrain}
