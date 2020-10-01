@@ -4,6 +4,7 @@ import Train from '../models/Train'
 import { saveTileData, loadTileData } from '../services/persistence'
 
 export const UPDATE_TRAIN = "UPDATE_TRAIN"
+export const STOP_TRAIN = "STOP_TRAIN"
 export const TRAIN_TRAVEL = "TRAIN_TRAVEL"
 export const INSERT_TRAIN = "INSERT_TRAIN"
 export const DELETE_TRAIN = "DELETE_TRAIN"
@@ -11,6 +12,7 @@ export const ADD_CAR_TO_TRAIN = "ADD_CAR_TO_TRAIN"
 export const REMOVE_CAR_FROM_TRAIN = "REMOVE_CAR_FROM_TRAIN"
 
 export const UPDATE_TILE = "UPDATE_TILE"
+export const ROTATE_TILE = "ROTATE_TILE"
 export const INSERT_TILE = "INSERT_TILE"
 export const DELETE_TILE = "DELETE_TILE"
 export const LOAD_TILES = "LOAD_TILES"
@@ -36,24 +38,24 @@ export const trainTravel = (train, steps) => ({
   payload: { train, steps }
 })
 
-export const stopTrain = (trainId) => ({
-  type: UPDATE_TRAIN,
-  payload: { id: trainId, speed: 0 }
+export const stopTrain = (train) => ({
+  type: STOP_TRAIN,
+  payload: train.id
 })
 
-export const addCarToTrain = (trainId) => ({
+export const addCarToTrain = (train) => ({
   type: ADD_CAR_TO_TRAIN,
-  payload: trainId
+  payload: train.id
 })
 
-export const removeCarFromTrain = (trainId) => ({
+export const removeCarFromTrain = (train) => ({
   type: REMOVE_CAR_FROM_TRAIN,
-  payload: trainId
+  payload: train.id
 })
 
-export const deleteTrain = (trainId) => ({
+export const deleteTrain = (train) => ({
   type: DELETE_TRAIN,
-  payload: trainId
+  payload: train.id
 })
 
 export const addTrainToTile = (tile) => {
@@ -88,21 +90,13 @@ export const updateTile = (tile) => ({
 })
 
 export const rotateTile = (tile) => ({
-  type: UPDATE_TILE,
-  payload: {
-    position: tile.position,
-    rotation: (tile.rotation + 90) % 360
-  }
+  type: ROTATE_TILE,
+  payload: tile.position
 })
 
 export const toggleTileSegment = (tile) => ({
-  type: UPDATE_TILE,
-  payload: {
-    position: tile.position,
-    selectedSegment: tile.selectedSegment < tile.segments.length - 1
-                   ? tile.selectedSegment + 1
-                   : 0
-  }
+  type: TOGGLE_SEGMENT,
+  payload: tile.position
 })
 
 export const insertTile = (tile) => ({
@@ -112,7 +106,7 @@ export const insertTile = (tile) => ({
 
 export const deleteTile = (tile) => ({
   type: DELETE_TILE,
-  payload: tile
+  payload: tile.position
 })
 
 export const loadTiles = (tiles) => ({
@@ -128,68 +122,53 @@ const actionHandlers = {
     trains[train.id] = train
     return { ...state, trains }
   },
-  [UPDATE_TRAIN]: (state, {payload}) => {
-    const existingTrain = selectTrainById(state, payload.id)
-    const updatedTrain = new Train({ ...existingTrain, ...payload })
-    return { ...state, trains: {
-      ...state.trains,
-      [payload.id]: updatedTrain
-    } }
+
+  [UPDATE_TRAIN]: (state, {payload}) => updateTrainOnState(state, payload),
+
+  [STOP_TRAIN]: (state, { payload: trainId }) => {
+    return updateTrainOnState(state, { id: trainId, speed: 0})
   },
+
   [TRAIN_TRAVEL]: (state, {payload}) => {
     const {train, steps} = payload
-    const {
-      tilePosition,
-      step,
-      tileDirection,
-      speed,
-    } = getDestinationTile(train, steps, state.tiles)
-
-
-    return {...state, trains: {
-      ...state.trains,
-      [train.id]: new Train({
-        ...train,
-        step,
-        tilePosition,
-        tileDirection,
-        speed
-      })
-    }}
-
+    const params = getDestinationTile(train, steps, state.tiles)
+    return updateTrainOnState(state, {...train, ...params})
   },
 
   [ADD_CAR_TO_TRAIN]: (state, { payload: trainId }) => {
-    const train = state.trains[trainId]
-    train.cars += 1
-    return {...state, trains: {
-      ...state.trains,
-      [trainId]: new Train(train)
-    }}
+    const train = selectTrainById(state, trainId)
+    const cars = train.cars + 1
+    return updateTrainOnState(state, { ...train, cars })
   },
 
   [REMOVE_CAR_FROM_TRAIN]: (state, { payload: trainId }) => {
-    const train = state.trains[trainId]
-    train.cars = (train.cars <= 0) ? 0 : train.cars - 1
-    return {...state, trains: {
-      ...state.trains,
-      [trainId]: new Train(train)
-    }}
+    const train = selectTrainById(state, trainId)
+    const cars = (train.cars <= 0) ? 0 : train.cars - 1
+    return updateTrainOnState(state, { ...train, cars })
   },
 
-  [DELETE_TRAIN]: (state, { payload }) => {
-    const trainId = payload
+  [DELETE_TRAIN]: (state, { payload: trainId }) => {
     const trains = {...state.trains}
     delete trains[trainId]
     return {...state, trains}
   },
 
   [UPDATE_TILE]: (state, { payload }) => {
-    const existingTile = selectTileByPosition(state, payload.position)
-    const updatedTile = new Tile({...existingTile, ...payload })
-    const index = updatedTile.position.toString()
-    const tiles = { ...state.tiles, [index]: updatedTile}
-    return { ...state, tiles }
+    return updateTileOnState(state, payload)
+  },
+
+  [ROTATE_TILE]: (state, { payload: position }) => {
+    const tile = state.tiles[position.toString()]
+    const rotation = (tile.rotation + 90) % 360
+    return updateTileOnState(state, {...tile, rotation})
+  },
+
+  [TOGGLE_SEGMENT]: (state, { payload: position }) => {
+    const tile = state.tiles[position.toString()]
+    const selectedSegment = tile.selectedSegment < tile.segments.length - 1
+                          ? tile.selectedSegment + 1
+                          : 0
+    return updateTileOnState(state, {...tile, selectedSegment})
   },
 
   [INSERT_TILE]: (state, { payload }) => {
@@ -199,9 +178,8 @@ const actionHandlers = {
     return {...state, tiles }
   },
 
-  [DELETE_TILE]: (state, { payload }) => {
-    const tile = payload
-    const index = tile.position.toString()
+  [DELETE_TILE]: (state, { payload: position }) => {
+    const index = position.toString()
     const tiles = {...state.tiles}
     delete tiles[index]
     return { ...state, tiles }
@@ -222,6 +200,37 @@ export default function reducer(state=initialState, action) {
   return actionHandlers.hasOwnProperty(action.type)
        ? actionHandlers[action.type](state, action)
        : state
+}
+
+/**
+ * utility function for persisting arbitrary changes
+ * to tiles on state
+ */
+function updateTileOnState(state, params) {
+  const index = params.position.toString()
+  const tile = state.tiles[index]
+  return {
+    ...state,
+    tiles: {
+      ...state.tiles,
+      [index]: new Tile({...tile, ...params})
+    }
+  }
+}
+
+/**
+ * utility function for persisting arbitrary changes
+ * to trains on state
+ */
+function updateTrainOnState(state, params) {
+  const train = selectTrainById(state, params.id)
+  return {
+    ...state,
+    trains: {
+      ...state.trains,
+      [train.id]: new Train({...train, ...params})
+    }
+  }
 }
 
 

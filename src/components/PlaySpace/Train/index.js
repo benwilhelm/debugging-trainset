@@ -20,7 +20,7 @@ export default ({ train, tiles, zoomFactor, stopTrain }) => {
 
   useEffect(() => {
     if (stopped) {
-      stopTrain(train.id)
+      stopTrain({id: train.id})
     }
   }, [ stopped, stopTrain, train.id ])
 

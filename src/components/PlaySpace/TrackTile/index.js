@@ -28,61 +28,77 @@ const TrackTile = ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop,
     >
       <g transform={`rotate(${rotation} ${TILE_WIDTH/2} ${TILE_HEIGHT/2})`}>
         <TileBg hovering={hovering} />
-        {sorted.map((seg) => (
-          (seg.type === 'STRAIGHT') ? <Straight key={`${tile.id}-${seg.type}`} rotation={seg.rotation} />
-          : (seg.type === 'CURVE') ? <Curve key={`${tile.id}-${seg.type}`} rotation={seg.rotation} />
-          : <></>
+        {sorted.map((segment) => (
+          <Segment  key={`${tile.id}-${segment.type}`} segment={segment} />
         ))}
 
         {segments.length > 1 && hovering &&
-          <text className="tile-control"
-            x={TILE_WIDTH / 2}
-            y={10}
-            width={15}
-            height={15}
-            dominantBaseline='middle'
-            textAnchor='middle'
-            transform='rotate(90 50 10)'
-            fill="white"
-            onClick={() => toggleSegment(tile)}
-          >{'\u292e'}</text>
+          <SegmentToggle toggleSegment={() => toggleSegment(tile)} />
         }
-
       </g>
 
 
       {hovering && (
-        <>
-          <RotateIcon className="tile-control"
-            x={TILE_WIDTH/2 - 10}
-            y={TILE_HEIGHT/2 - 10}
-            width={20}
-            height={20}
-            fill="white"
-            onClick={() => rotateTile(tile)}
-          />
-
-          <TrashIcon className="tile-control"
-            x={TILE_WIDTH - 30}
-            y={TILE_HEIGHT - 30}
-            width={20}
-            height={20}
-            fill="white"
-            onClick={() => deleteTile(tile)}
-          />
-
-          <TrainIcon className="tile-control"
-            x={10}
-            y={TILE_HEIGHT - 30}
-            width={20}
-            height={20}
-            fill="white"
-            onClick={() => insertTrain(tile)}
-          />
-
-        </>
+        <TileControls
+          rotateTile={() => rotateTile(tile)}
+          deleteTile={() => deleteTile(tile)}
+          insertTrain={() => insertTrain(tile)}
+        />
       )}
     </svg>
   )
 }
 export default TrackTile
+
+
+
+const Segment = ({ segment }) => (
+  (segment.type === 'STRAIGHT') ? <Straight rotation={segment.rotation} />
+  : (segment.type === 'CURVE') ? <Curve rotation={segment.rotation} />
+  : <></>
+)
+
+const SegmentToggle = ({ toggleSegment }) => (
+  <text className="tile-control"
+    x={TILE_WIDTH / 2}
+    y={10}
+    width={15}
+    height={15}
+    dominantBaseline='middle'
+    textAnchor='middle'
+    transform='rotate(90 50 10)'
+    fill="white"
+    onClick={toggleSegment}
+  >{'\u292e'}</text>
+)
+
+const TileControls = ({ rotateTile, deleteTile, insertTrain }) => (
+  <>
+    <RotateIcon className="tile-control"
+      x={TILE_WIDTH/2 - 10}
+      y={TILE_HEIGHT/2 - 10}
+      width={20}
+      height={20}
+      fill="white"
+      onClick={rotateTile}
+    />
+
+    <TrashIcon className="tile-control"
+      x={TILE_WIDTH - 30}
+      y={TILE_HEIGHT - 30}
+      width={20}
+      height={20}
+      fill="white"
+      onClick={deleteTile}
+    />
+
+    <TrainIcon className="tile-control"
+      x={10}
+      y={TILE_HEIGHT - 30}
+      width={20}
+      height={20}
+      fill="white"
+      onClick={insertTrain}
+    />
+  </>
+)
