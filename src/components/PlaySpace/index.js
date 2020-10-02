@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { range } from 'lodash'
 import TrackTile from './TrackTile'
 import HoverIndicator from './HoverIndicator'
 import Train from './Train'
@@ -19,6 +20,7 @@ import store, {
   stopTrain,
   selectAllTrains,
   selectAllTiles,
+  getDestinationTile
 } from '../../store'
 
 
@@ -81,7 +83,6 @@ const PlaySpace = ({
           <Train
             key={`train-${train.id}`}
             train={train}
-            tiles={tilesByPosition}
             zoomFactor={zoomFactor}
             stopTrain={dispatchStopTrain}
           />))}
@@ -95,7 +96,23 @@ const PlaySpace = ({
 const mapState = (state) => ({
   tiles: selectAllTiles(state),
   tilesByPosition: state.playspace.tiles,
-  trains: selectAllTrains(state)
+
+  // deriving engine and car locations/rotations from train tile/step
+  trains: selectAllTrains(state).map(train => {
+    const { tiles } = state.playspace
+    const tile = tiles[train.tilePosition.toString()]
+    const engineLocation = tile.travelFunction(train.step, train.tileDirection)
+    const carLocations = (range(train.cars)).map(i => {
+      const car = getDestinationTile(train, -50 * (i+1), tiles)
+      const carTile = tiles[car.tilePosition.toString()]
+      return carTile.travelFunction(car.step, car.tileDirection)
+    })
+    return {
+      ...train,
+      engineLocation,
+      carLocations
+    }
+  })
 })
 
 const mapDispatch = (dispatch) => ({
@@ -104,7 +121,7 @@ const mapDispatch = (dispatch) => ({
   dispatchRotateTile: (tile) => dispatch(persistTileAction(tile, rotateTile)),
   dispatchAddTrainToTile: (tile) => dispatch(addTrainToTile(tile)),
   dispatchFetchTiles: (...args) => dispatch(fetchTiles(...args)),
-  dispatchToggleSegment: (...args) => dispatch(toggleTileSegment(...args)),
+  dispatchToggleSegment: (tile) => dispatch(persistTileAction(tile, toggleTileSegment)),
   dispatchTrainTravel: (...args) => dispatch(trainTravel(...args)),
   dispatchStopTrain: (...args) => dispatch(stopTrain(...args))
 })

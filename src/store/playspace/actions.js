@@ -1,4 +1,5 @@
 import { Train, Tile } from '../../models'
+import { keyBy } from 'lodash'
 
 export const UPDATE_TRAIN = "UPDATE_TRAIN"
 export const STOP_TRAIN = "STOP_TRAIN"
@@ -81,7 +82,10 @@ export const deleteTile = (tile) => ({
   payload: tile.position
 })
 
-export const loadTiles = (tiles) => ({
-  type: LOAD_TILES,
-  payload: tiles
-})
+export const loadTiles = (tileArray) => {
+  const tiles = tileArray.map(tile => new Tile(tile))
+  return {
+    type: LOAD_TILES,
+    payload: keyBy(tiles, tile => tile.position.toString())
+  }
+}

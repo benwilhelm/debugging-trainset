@@ -25,7 +25,8 @@ export default createStore(
 export {
   updateTile, deleteTile, toggleTileSegment, insertTile, rotateTile,
   fetchTiles, persistTileAction, addTrainToTile,
-  updateTrain, trainTravel, deleteTrain, stopTrain, addCarToTrain, removeCarFromTrain
+  updateTrain, trainTravel, deleteTrain, stopTrain, addCarToTrain, removeCarFromTrain,
+  getDestinationTile
 } from './playspace'
 
 export const selectTrainById = (state, id) => selectTrainFromSlice(state.playspace, id)

@@ -4,6 +4,7 @@ import {
   updateTrainOnState,
   getDestinationTile,
   selectTrainById,
+  tileIsOccupied,
 } from './selectors'
 
 export const initialState = {
@@ -84,13 +85,16 @@ const actionHandlers = {
   DELETE_TILE: (state, { payload: position }) => {
     const index = position.toString()
     const tiles = {...state.tiles}
+
+    if (tileIsOccupied(state, tiles[index]))
+      return state
+
     delete tiles[index]
     return { ...state, tiles }
   },
 
   LOAD_TILES: (state, { payload }) => {
-    const tiles = keyBy(payload, tile => tile.position.toString())
-    return { ...state, tiles }
+    return { ...state, tiles: payload }
   }
 
 }

@@ -32,6 +32,11 @@ export const selectAllTiles = (state) => {
 export function updateTileOnState(state, params) {
   const index = params.position.toString()
   const tile = state.tiles[index]
+
+  if (tileIsOccupied(state, tile)) {
+    return state
+  }
+
   return {
     ...state,
     tiles: {
@@ -39,6 +44,12 @@ export function updateTileOnState(state, params) {
       [index]: new Tile({...tile, ...params})
     }
   }
+}
+
+export function tileIsOccupied(state, tile) {
+  const index = tile.position.toString()
+  const occupiedTiles = Object.values(state.trains).map(tr => tr.tilePosition.toString())
+  return occupiedTiles.includes(index)
 }
 
 /**
