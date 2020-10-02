@@ -4,7 +4,7 @@ import Car from './Car'
 import { range } from 'lodash'
 import './index.css'
 
-import { getDestinationTile } from '../../../store/playspace'
+import { getDestinationTile } from '../../../store/playspace/selectors'
 
 export default ({ train, tiles, zoomFactor, stopTrain }) => {
   const tile = tiles[train.tilePosition.toString()]

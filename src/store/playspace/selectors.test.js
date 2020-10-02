@@ -1,9 +1,8 @@
-import Tile from '../models/Tile'
-import Train from '../models/Train'
-import { QUARTER_ARC_LENGTH } from '../constants'
-import { getDestinationTile } from './playspace'
+import { Tile, Train } from '../../models'
+import { QUARTER_ARC_LENGTH } from '../../constants'
+import { getDestinationTile } from './selectors'
 
-describe('playspace reducer', () => {
+describe('playspace selectors', () => {
   describe('getDestinationTile()', () => {
 
     let train
