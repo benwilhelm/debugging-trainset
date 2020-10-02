@@ -1,4 +1,3 @@
-import { keyBy } from 'lodash'
 import {
   updateTileOnState,
   updateTrainOnState,
@@ -77,7 +76,7 @@ const actionHandlers = {
       ...state,
       tiles: {
         ...state.tiles,
-        [index]: payload
+        [index]: {...payload}
       }
     }
   },
