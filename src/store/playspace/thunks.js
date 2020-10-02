@@ -7,8 +7,12 @@ export const persistTiles = () => async (dispatch, getState) => {
 }
 
 export const persistTileAction = (tile, actionCreator) => async (dispatch) => {
-  dispatch(actionCreator(tile))
-  return dispatch(persistTiles())
+  try {
+    dispatch(actionCreator(tile))
+    return dispatch(persistTiles())
+  } catch (err) {
+    throw err
+  }
 }
 
 export const fetchTiles = () => async (dispatch) => {

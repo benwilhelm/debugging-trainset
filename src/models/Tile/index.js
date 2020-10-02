@@ -10,6 +10,9 @@ export default class Tile {
     this.id = id || uuid()
     this.rotation = rotation
     this.segments = getTileSegments(type)
+    if (selectedSegment >= this.segments.length) {
+      throw new Error('Invalid index for selected segment')
+    }
     this.selectedSegment = selectedSegment
   }
 
@@ -122,6 +125,6 @@ function getTileSegments(type) {
         segmentFactory({ type: "CURVE", rotation: 0 })
       ]
     default:
-      throw new Error(`Unknown segment type: ${type}`)
+      throw new Error(`Unknown tile type: ${type}`)
   }
 }

@@ -29,7 +29,7 @@ const TrackTile = ({ tile, updateTile=noop, toggleSegment=noop, deleteTile=noop,
       <g transform={`rotate(${rotation} ${TILE_WIDTH/2} ${TILE_HEIGHT/2})`}>
         <TileBg hovering={hovering} />
         {sorted.map((segment) => (
-          <Segment  key={`${tile.id}-${segment.type}`} segment={segment} />
+          <Segment key={`${tile.id}-${segment.type}`} segment={segment} />
         ))}
 
         {segments.length > 1 && hovering &&

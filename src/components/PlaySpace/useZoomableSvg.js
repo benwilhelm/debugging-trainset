@@ -12,7 +12,7 @@ const useZoomableSvg = () => {
 
   const containerEl = useRef(null)
   const svgEl = useRef(null)
-  const [viewBox, setViewBox] = useState([200, 0, 400, 400 ])
+  const [viewBox, setViewBox] = useState([0, 0, 400, 400 ])
 
   const zoomHandler = (e) => {
     const [ pointerX, pointerY ] = pageCoordsToSvgCoords([e.clientX, e.clientY], svgEl.current)
