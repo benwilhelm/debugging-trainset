@@ -64,10 +64,10 @@ const actionHandlers = {
 
   TOGGLE_SEGMENT: (state, { payload: position }) => {
     const tile = state.tiles[position.toString()]
-    const selectedSegment = tile.selectedSegment < tile.segments.length
+    const selectedSegment = tile.selectedSegment < tile.segments.length - 1
                           ? tile.selectedSegment + 1
                           : 0
-    return updateTileOnState(state, {...tile, ...selectedSegment})
+    return updateTileOnState(state, {...tile, selectedSegment})
   },
 
   INSERT_TILE: (state, { payload }) => {
