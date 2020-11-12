@@ -76,7 +76,7 @@ const actionHandlers = {
       ...state,
       tiles: {
         ...state.tiles,
-        [index]: {...payload}
+        [index]: payload
       }
     }
   },
