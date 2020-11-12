@@ -30,18 +30,18 @@ const TrackTile = ({ tile, deleteTile=noop, rotateTile=noop }) => {
         <TileBg hovering={hovering} />
 
         {
-          (tile.type === 'STRAIGHT') ? <StraightTrack rotation={rotation} />
+          (tile.type === 'STRAIGHT') ? <StraightTrack rotation={0} />
 
-          : (tile.type === 'CURVE') ? <CurvedTrack rotation={rotation} />
+          : (tile.type === 'CURVE') ? <CurvedTrack rotation={0} />
 
           : (tile.type === 'YLEFT') ? <>
-            <CurvedTrack rotation={rotation + 90}  />
-            <StraightTrack rotation={rotation}  />
+            <CurvedTrack rotation={90}  />
+            <StraightTrack rotation={0}  />
           </>
 
           : (tile.type === 'YRIGHT') ? <>
-            <CurvedTrack rotation={rotation} />
-            <StraightTrack rotation={rotation} />
+            <CurvedTrack rotation={0} />
+            <StraightTrack rotation={0} />
           </>
 
           : <></>
