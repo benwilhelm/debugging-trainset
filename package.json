@@ -15,6 +15,10 @@
   },
   "scripts": {
     "start": "react-scripts start --no-cache",
+    "solution:ws1": "git diff ws1-start..ws1-solution",
+    "solution:ws2": "git diff ws2-start..ws2-solution",
+    "solution:ws3": "git diff ws3-start..ws3-solution",
+    "solution:ws4": "git diff ws4-start..ws4-solution",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
