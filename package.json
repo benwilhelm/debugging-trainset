@@ -14,7 +14,8 @@
     "uuid": "^8.3.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts start --no-cache",
+    "solution:ex1": "git diff exercise/01-tiles-solution..exercise/01-tiles-start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
