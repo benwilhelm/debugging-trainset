@@ -3,7 +3,7 @@
 
 import { useRef, useEffect } from 'react'
 
-export default (callback) => {
+const useAnimationFrame = (callback) => {
   const requestRef = useRef()
   const previousTimeRef = useRef()
 
@@ -25,3 +25,5 @@ export default (callback) => {
     return () => cancelAnimationFrame(requestRef.current)
   }, [callback])
 }
+
+export default useAnimationFrame
