@@ -5,7 +5,7 @@ import { TRACK_WIDTH } from '../../../constants'
 const ENGINE_LENGTH = TRACK_WIDTH * 3
 const ENGINE_WIDTH = TRACK_WIDTH + 10
 
-export default ({ train, coordinates, rotation, highlight, zoomFactor }) => {
+const Engine = ({ train, coordinates, rotation, highlight, zoomFactor }) => {
   const [ x, y ] = coordinates
 
   return <svg className='engine' x={x} y={y}>
@@ -35,3 +35,5 @@ export default ({ train, coordinates, rotation, highlight, zoomFactor }) => {
     )}
   </svg>
 }
+
+export default Engine

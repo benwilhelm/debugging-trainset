@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default ({coordinates, zoomFactor, color='white'}) => {
+const Locator = ({coordinates, zoomFactor, color='white'}) => {
   const [ x, y ] = coordinates
   return (
     <g transform={`scale(${1/zoomFactor}) translate(${x * zoomFactor} ${y * zoomFactor})`}>
@@ -12,3 +12,5 @@ export default ({coordinates, zoomFactor, color='white'}) => {
     </g>
   )
 }
+
+export default Locator

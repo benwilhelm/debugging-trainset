@@ -1,7 +1,7 @@
 import React from 'react'
 const noop = () => {}
 
-export default ({ train, updateTrain=noop, min=-100, max=100, step=1 }) => {
+const TrainSpeed = ({ train, updateTrain=noop, min=-100, max=100, step=1 }) => {
   const dataListId = `train-speed-input-list-${train.id}`
   return <div className="train-speed">
     <input type="range"
@@ -29,3 +29,5 @@ export default ({ train, updateTrain=noop, min=-100, max=100, step=1 }) => {
 
   </div>
 }
+
+export default TrainSpeed

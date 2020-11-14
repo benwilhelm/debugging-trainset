@@ -10,7 +10,7 @@ const ColorIndicator = ({color, onClick}) => {
   )
 }
 
-export default ({ train, updateTrain, deleteTrain, addCar, removeCar }) => {
+const TrainControl = ({ train, updateTrain, deleteTrain, addCar, removeCar }) => {
 
   const handleMouseEnter = () => updateTrain({...train, highlight: true })
   const handleMouseLeave = () => updateTrain({...train, highlight: false })
@@ -34,3 +34,5 @@ export default ({ train, updateTrain, deleteTrain, addCar, removeCar }) => {
     </div>
   )
 }
+
+export default TrainControl
