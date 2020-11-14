@@ -4,7 +4,7 @@ import { TRACK_WIDTH } from '../../../constants'
 const CAR_LENGTH = TRACK_WIDTH * 3
 const CAR_WIDTH = TRACK_WIDTH + 6
 
-export default ({ train, coordinates, rotation, }) => {
+const Car = ({ train, coordinates, rotation, }) => {
   const [ x, y ] = coordinates
 
   return <svg className='car' x={x} y={y}>
@@ -24,3 +24,5 @@ export default ({ train, coordinates, rotation, }) => {
     </g>
   </svg>
 }
+
+export default Car

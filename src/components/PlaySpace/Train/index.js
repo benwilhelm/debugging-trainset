@@ -4,7 +4,7 @@ import Car from './Car'
 import './index.css'
 
 
-export default ({ train, zoomFactor, stopTrain }) => {
+const Train = ({ train, zoomFactor, stopTrain }) => {
 
   const { point, rotation } = train.engineLocation
   const stopped = train.carLocations.map(loc => loc.speed).includes(0)
@@ -19,3 +19,5 @@ export default ({ train, zoomFactor, stopTrain }) => {
     <Engine key={`engine-${train.id}`} train={train} coordinates={point} rotation={rotation} zoomFactor={zoomFactor} />
   </>
 }
+
+export default Train
