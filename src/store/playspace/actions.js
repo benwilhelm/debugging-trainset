@@ -1,3 +1,7 @@
+/**
+ * Action constants and action creators for the Playspace store
+ */
+
 import { Train, Tile } from '../../models'
 import { keyBy } from 'lodash'
 
