@@ -1,3 +1,8 @@
+/**
+ * A variety of selector functions and other
+ * utilities for working with data in the Redux store
+ */
+
 import { TILE_WIDTH, TILE_HEIGHT} from '../../constants'
 import { Tile, Train } from '../../models'
 

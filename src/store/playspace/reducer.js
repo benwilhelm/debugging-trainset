@@ -1,3 +1,11 @@
+/**
+ * This is the reducer for all actions within the playspace.
+ *
+ * Action creators can be found in ./actions
+ * Selector functions and other utilities can be found in ./selectors.js
+ * Asynchronous behavior is found in ./thunks.js
+ */
+
 import {
   updateTileOnState,
   updateTrainOnState,
